@@ -1,33 +1,40 @@
-import MEMORIES from "./assets/imgs/memories.png";
-import { AppBar, Container, Grid, Grow, Typography } from "@mui/material";
+import MEMORIES from "../assets/imgs/memories.png";
+import { Container, Grow, Button, Box } from "@mui/material";
+import React, { useState } from "react";
 import Posts from "../components/Posts/Posts";
 import Form from "../components/Form/Form";
+import { AppBar, Heading, Image } from "./App.styled";
 
 function App() {
+  const [modalOpen, setModelOpen] = useState(false);
+
+  function handleModelOpen(value: boolean) {
+    setModelOpen(value);
+  }
+
   return (
     <Container maxWidth="lg">
       <AppBar position="static" color="inherit">
-        <Typography variant="h2" align="center">
+        <Heading variant="h2" align="center">
           Memories
-        </Typography>
-        <img src={MEMORIES} alt="memories" height="60" width={60} />
+        </Heading>
+        <Image src={MEMORIES} alt="memories" height={60} width={60} />
       </AppBar>
 
       <Grow in>
-        <Container>
-          <Grid
-            container
-            justifyContent="space-between"
-            alignItems="stretch"
-            spacing={3}
-          >
-            <Grid item xs={12} sm={7}>
-              <Posts />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Form />
-            </Grid>
-          </Grid>
+        <Container sx={{ display: "flex", flexDirection: "column" }}>
+          <Box sx={{ alignSelf: "flex-end" }}>
+            <Button
+              onClick={() => {
+                setModelOpen(true);
+              }}
+            >
+              Add a new memory
+            </Button>
+            <Form modalOpen={modalOpen} onModelOpen={handleModelOpen} />
+          </Box>
+
+          <Posts />
         </Container>
       </Grow>
     </Container>
