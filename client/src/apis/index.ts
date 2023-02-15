@@ -5,7 +5,6 @@ import {
   createApi,
   fetchBaseQuery,
 } from "@reduxjs/toolkit/query/react";
-// import { getToken } from "../utils/auth"
 
 export const EDT_BASE_API_REDUCER_KEY = "baseApi";
 
@@ -14,10 +13,10 @@ export const queryTagTypes = { POST: "POST" };
 const customBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_APP_API_URL,
   prepareHeaders: (headers) => {
-    // const accessToken = getToken()
-    // if (accessToken) {
-    //   headers.set("Authorization", `Bearer ${accessToken}`)
-    // }
+    const accessToken = localStorage.getItem("token");
+    if (accessToken) {
+      headers.set("Authorization", accessToken);
+    }
     return headers;
   },
 });

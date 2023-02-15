@@ -13,7 +13,7 @@ import React, { useState } from "react";
 
 import Form from "../../Form/Form";
 import {
-  useUpdatePostMutation,
+  useLikePostMutation,
   useDeletePostMutation,
 } from "../../../apis/postSlice";
 import { Card, CardActions, Overlay, Overlay2 } from "./Post.styled";
@@ -23,7 +23,7 @@ interface PostProps {
 }
 
 function Post({ post }: PostProps) {
-  const [updatePost] = useUpdatePostMutation();
+  const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
 
   const [modalOpen, setModelOpen] = useState(false);
@@ -43,10 +43,7 @@ function Post({ post }: PostProps) {
   }
 
   async function handleLikePost() {
-    await updatePost({
-      id: post._id,
-      payload: { likeCount: post.likeCount + 1 },
-    })
+    await likePost(post._id as string)
       .unwrap()
       .catch((err) => console.log(err));
   }
@@ -121,7 +118,7 @@ function Post({ post }: PostProps) {
         <CardActions>
           <Button color="primary" size="small" onClick={handleLikePost}>
             <ThumbUpAlt fontSize="small" />
-            Like {post.likeCount}
+            &nbsp; Like &nbsp; {post.likeCount}
           </Button>
           <Button color="primary" size="small" onClick={handleDeletePost}>
             <Delete fontSize="small" />

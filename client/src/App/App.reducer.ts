@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 export interface AppState {
   currentPost: PostPayload | null;
+  user: any;
 }
 
 const initialState: AppState = {
@@ -12,6 +13,7 @@ const initialState: AppState = {
     tags: [],
     selectedFile: "",
   },
+  user: null,
 };
 
 export const appSlice = createSlice({
@@ -21,11 +23,14 @@ export const appSlice = createSlice({
     setCurrentPost(state, action) {
       state.currentPost = action.payload;
     },
+    setUser(state, action) {
+      state.user = action.payload;
+    },
   },
 });
 
 export const appReducer = appSlice.reducer;
 
-export const { setCurrentPost } = appSlice.actions;
+export const { setCurrentPost, setUser } = appSlice.actions;
 
 export default appSlice.reducer;

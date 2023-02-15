@@ -1,42 +1,42 @@
-import MEMORIES from "../assets/imgs/memories.png";
-import { Container, Grow, Button, Box } from "@mui/material";
-import React, { useState } from "react";
-import Posts from "../components/Posts/Posts";
-import Form from "../components/Form/Form";
-import { AppBar, Heading, Image } from "./App.styled";
+import { Container, CircularProgress } from "@mui/material";
+import { lazy, Suspense, useLayoutEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { setUser } from "./App.reducer";
+import { useAppDispatch } from "../store/store";
+import Navbar from "../components/Navbar/Navbar";
+
+const Auth = lazy(() => import("../pages/Auth/Auth"));
+const Home = lazy(() => import("../pages/Home/Home"));
 
 function App() {
-  const [modalOpen, setModelOpen] = useState(false);
+  const dispatch = useAppDispatch();
 
-  function handleModelOpen(value: boolean) {
-    setModelOpen(value);
-  }
+  useLayoutEffect(() => {
+    let isNew = true;
+    let currentUser = localStorage.getItem("currentUser");
+
+    if (isNew && currentUser) {
+      currentUser = JSON.parse(currentUser);
+      dispatch(setUser(currentUser));
+    }
+
+    return () => {
+      isNew = false;
+    };
+  }, []);
 
   return (
     <Container maxWidth="lg">
-      <AppBar position="static" color="inherit">
-        <Heading variant="h2" align="center">
-          Memories
-        </Heading>
-        <Image src={MEMORIES} alt="memories" height={60} width={60} />
-      </AppBar>
-
-      <Grow in>
-        <Container sx={{ display: "flex", flexDirection: "column" }}>
-          <Box sx={{ alignSelf: "flex-end" }}>
-            <Button
-              onClick={() => {
-                setModelOpen(true);
-              }}
-            >
-              Add a new memory
-            </Button>
-            <Form modalOpen={modalOpen} onModelOpen={handleModelOpen} />
-          </Box>
-
-          <Posts />
-        </Container>
-      </Grow>
+      <BrowserRouter>
+        <Navbar />
+        <Suspense fallback={<CircularProgress />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/auth" element={<Auth />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
     </Container>
   );
 }
