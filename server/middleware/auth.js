@@ -8,6 +8,6 @@ export default async function auth(req, res, next) {
     req.userId = decodedData?.id;
     next();
   } catch (error) {
-    console.log("error: ", error);
+    res.status(401).json({ message: "Token expired or invalid" });
   }
 }

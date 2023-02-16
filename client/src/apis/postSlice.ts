@@ -23,8 +23,8 @@ const postSlice = baseApi.injectEndpoints({
 
     likePost: builder.mutation<void, string>({
       query: (id) => ({
-        method: "POST",
-        url: `${BASE_PATH}/${id}`,
+        method: "PATCH",
+        url: `${BASE_PATH}/${id}-likePost`,
       }),
       invalidatesTags: [queryTagTypes.POST],
     }),

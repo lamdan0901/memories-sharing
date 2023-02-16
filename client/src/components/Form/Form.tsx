@@ -17,14 +17,16 @@ import {
   useUpdatePostMutation,
 } from "../../apis/postSlice";
 import { FileInput, FormWrapper } from "./Form.styled";
+import { useAppSelector } from "../../store/store";
 
 const initialPost = {
   creator: "",
+  creatorId: "",
   title: "",
   message: "",
   tags: [],
   selectedFile: "",
-  likeCount: 0,
+  likes: [],
 };
 
 interface FormModalProps {
@@ -34,21 +36,32 @@ interface FormModalProps {
 }
 
 function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
+  const { user } = useAppSelector((state) => state.app);
   const [createPost] = useCreatePostMutation();
   const [updatePost] = useUpdatePostMutation();
-  const [post, setPost] = useState<Post>(() => _post ?? initialPost);
+  const [post, setPost] = useState<Post>(() =>
+    _post
+      ? {
+          ..._post,
+          tags: (_post.tags as string[]).join(" "),
+        }
+      : initialPost
+  );
 
   async function submitForm(e: React.FormEvent) {
     e.preventDefault();
 
     if (!Array.isArray(post.tags)) {
-      post.tags = post.tags.split(/[ .,]/);
+      post.tags = post.tags.trim().split(/[ .,]/);
     }
-    console.log("post.tags: ", post.tags);
 
     try {
       if (!_post) {
-        await createPost(post).unwrap();
+        await createPost({
+          ...post,
+          creator: `${user?.firstName} ${user?.lastName}`,
+          creatorId: user?._id as string,
+        }).unwrap();
       } else {
         await updatePost({ id: post._id, payload: post }).unwrap();
       }
@@ -88,15 +101,6 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                 {_post ? "Edit" : "Create"} a Memory
               </Typography>
 
-              <TextField
-                name="creator"
-                variant="outlined"
-                label="Creator"
-                fullWidth
-                sx={{ margin: 1 }}
-                value={post.creator}
-                onChange={handleFormInputChange}
-              />
               <TextField
                 name="title"
                 variant="outlined"

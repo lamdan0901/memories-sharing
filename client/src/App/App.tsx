@@ -1,38 +1,24 @@
 import { Container, CircularProgress } from "@mui/material";
-import { lazy, Suspense, useLayoutEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { setUser } from "./App.reducer";
-import { useAppDispatch } from "../store/store";
 import Navbar from "../components/Navbar/Navbar";
 
 const Auth = lazy(() => import("../pages/Auth/Auth"));
 const Home = lazy(() => import("../pages/Home/Home"));
+const PostDetail = lazy(() => import("../pages/PostDetail/PostDetail"));
 
 function App() {
-  const dispatch = useAppDispatch();
-
-  useLayoutEffect(() => {
-    let isNew = true;
-    let currentUser = localStorage.getItem("currentUser");
-
-    if (isNew && currentUser) {
-      currentUser = JSON.parse(currentUser);
-      dispatch(setUser(currentUser));
-    }
-
-    return () => {
-      isNew = false;
-    };
-  }, []);
-
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <BrowserRouter>
         <Navbar />
         <Suspense fallback={<CircularProgress />}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Navigate to="/posts" />} />
+            <Route path="/posts" element={<Home />} />
+            <Route path="/posts/:id" element={<PostDetail />} />
+            <Route path="/posts/search" element={<Auth />} />
             <Route path="/auth" element={<Auth />} />
           </Routes>
         </Suspense>

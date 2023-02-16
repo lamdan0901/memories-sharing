@@ -17,12 +17,14 @@ import {
   useDeletePostMutation,
 } from "../../../apis/postSlice";
 import { Card, CardActions, Overlay, Overlay2 } from "./Post.styled";
+import { useAppSelector } from "../../../store/store";
 
 interface PostProps {
   post: Post;
 }
 
 function Post({ post }: PostProps) {
+  const { user } = useAppSelector((state) => state.app);
   const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
 
@@ -85,15 +87,17 @@ function Post({ post }: PostProps) {
           </Typography>
         </Overlay>
 
-        <Overlay2>
-          <IconButton
-            sx={{ color: "white", background: "#22222238" }}
-            size="small"
-            onClick={handleOpenMenu}
-          >
-            <MoreHoriz fontSize="small" />
-          </IconButton>
-        </Overlay2>
+        {user?._id === post.creatorId && (
+          <Overlay2>
+            <IconButton
+              sx={{ color: "white", background: "#22222238" }}
+              size="small"
+              onClick={handleOpenMenu}
+            >
+              <MoreHoriz fontSize="small" />
+            </IconButton>
+          </Overlay2>
+        )}
         <Menu
           open={Boolean(anchorEl)}
           anchorEl={anchorEl}
@@ -116,14 +120,25 @@ function Post({ post }: PostProps) {
         </CardContent>
 
         <CardActions>
-          <Button color="primary" size="small" onClick={handleLikePost}>
+          <Button
+            color={
+              post.likes.includes(user?._id as string) ? "success" : "primary"
+            }
+            size="small"
+            onClick={handleLikePost}
+            sx={{
+              pointerEvents: !user ? "none" : "auto",
+            }}
+          >
             <ThumbUpAlt fontSize="small" />
-            &nbsp; Like &nbsp; {post.likeCount}
+            &nbsp; {post.likes.length} Like{post.likes.length > 1 ? "s" : ""}
           </Button>
-          <Button color="primary" size="small" onClick={handleDeletePost}>
-            <Delete fontSize="small" />
-            Delete
-          </Button>
+          {user?._id === post.creatorId && (
+            <Button color="warning" size="small" onClick={handleDeletePost}>
+              <Delete fontSize="small" />
+              Delete
+            </Button>
+          )}
         </CardActions>
       </Card>
 

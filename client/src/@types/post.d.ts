@@ -3,9 +3,10 @@ interface Post {
   title: string;
   message: string;
   creator: string;
+  creatorId: string;
   tags: string[] | string;
   selectedFile: string;
-  likeCount: number;
+  likes: string[];
   createdAt?: Date;
 }
 

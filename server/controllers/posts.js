@@ -41,8 +41,6 @@ export const likePost = async (req, res) => {
   } else {
     post.likes.splice(index, 1); // dislike
   }
-  console.log("req.userId: ", typeof req.userId);
-  console.log("post.likes: ", post.likes);
 
   const likedPost = await PostMessage.findByIdAndUpdate(
     _id,
@@ -57,7 +55,6 @@ export const likePost = async (req, res) => {
 export const updatePost = async (req, res) => {
   const { id: _id } = req.params;
   const post = req.body;
-  console.log("post: ", post);
 
   if (!mongoose.Types.ObjectId.isValid(_id))
     return res.status(404).send("Post not found");
