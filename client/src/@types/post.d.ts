@@ -1,5 +1,6 @@
 interface Post {
   _id?: string;
+  comments: string[];
   title: string;
   message: string;
   creator: string;
@@ -10,4 +11,16 @@ interface Post {
   createdAt?: Date;
 }
 
-type PostPayload = Partial<Post>;
+interface GetPostsPayload {
+  page: string;
+  text?: string;
+  tags?: string;
+}
+
+interface GetPostsResponse {
+  posts: Post[];
+  currentPage: number;
+  numOfPages: number;
+}
+
+type UpdatePostPayload = Partial<Post>;

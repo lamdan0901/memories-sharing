@@ -1,11 +1,13 @@
 import { CircularProgress, Grid } from "@mui/material";
-import { useGetPostsQuery } from "../../apis/postSlice";
 import Post from "./Post/Post";
 
-function Posts() {
-  const { data: posts, isLoading } = useGetPostsQuery();
+interface PostsProps {
+  posts?: Post[];
+  isFetching: boolean;
+}
 
-  if (isLoading) return <CircularProgress />;
+function Posts({ posts, isFetching }: PostsProps) {
+  if (isFetching) return <CircularProgress />;
 
   return (
     <Grid

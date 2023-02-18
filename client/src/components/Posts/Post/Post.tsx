@@ -18,26 +18,29 @@ import {
 } from "../../../apis/postSlice";
 import { Card, CardActions, Overlay, Overlay2 } from "./Post.styled";
 import { useAppSelector } from "../../../store/store";
+import { useNavigate } from "react-router-dom";
 
 interface PostProps {
   post: Post;
+  isRecommended?: boolean;
 }
 
-function Post({ post }: PostProps) {
+function Post({ post, isRecommended }: PostProps) {
   const { user } = useAppSelector((state) => state.app);
   const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
+  const navigate = useNavigate();
 
   const [modalOpen, setModelOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+  function handleOpenMenu(event: React.MouseEvent<HTMLButtonElement>) {
     setAnchorEl(event.currentTarget);
-  };
+  }
 
-  const handleCloseMenu = () => {
+  function handleCloseMenu() {
     setAnchorEl(null);
-  };
+  }
 
   function handleModelOpen(value: boolean) {
     setModelOpen(value);
@@ -61,9 +64,11 @@ function Post({ post }: PostProps) {
       <Card>
         <CardMedia
           component="img"
+          onClick={() => navigate(`/posts/${post._id}`)}
           image={post.selectedFile}
           alt="error while loading image"
           sx={{
+            cursor: "pointer",
             transform: "scale(1)",
             transition: "all 0.2s ease-out",
             "&:hover": {
@@ -78,16 +83,18 @@ function Post({ post }: PostProps) {
           }}
         />
 
-        <Overlay>
-          <Typography variant="h6" sx={{ textShadow: "0px 0px 8px #111" }}>
-            {post.creator}
-          </Typography>
-          <Typography fontSize={12} sx={{ textShadow: "0px 0px 5px #111" }}>
-            {moment(post.createdAt).fromNow()}
-          </Typography>
-        </Overlay>
+        {!isRecommended && (
+          <Overlay>
+            <Typography variant="h6" sx={{ textShadow: "0px 0px 8px #111" }}>
+              {post.creator}
+            </Typography>
+            <Typography fontSize={12} sx={{ textShadow: "0px 0px 5px #111" }}>
+              {moment(post.createdAt).fromNow()}
+            </Typography>
+          </Overlay>
+        )}
 
-        {user?._id === post.creatorId && (
+        {user?._id === post.creatorId && !isRecommended && (
           <Overlay2>
             <IconButton
               sx={{ color: "white", background: "#22222238" }}
@@ -119,27 +126,29 @@ function Post({ post }: PostProps) {
           </Typography>
         </CardContent>
 
-        <CardActions>
-          <Button
-            color={
-              post.likes.includes(user?._id as string) ? "success" : "primary"
-            }
-            size="small"
-            onClick={handleLikePost}
-            sx={{
-              pointerEvents: !user ? "none" : "auto",
-            }}
-          >
-            <ThumbUpAlt fontSize="small" />
-            &nbsp; {post.likes.length} Like{post.likes.length > 1 ? "s" : ""}
-          </Button>
-          {user?._id === post.creatorId && (
-            <Button color="warning" size="small" onClick={handleDeletePost}>
-              <Delete fontSize="small" />
-              Delete
+        {!isRecommended && (
+          <CardActions>
+            <Button
+              color={
+                post.likes.includes(user?._id as string) ? "success" : "primary"
+              }
+              size="small"
+              onClick={handleLikePost}
+              sx={{
+                pointerEvents: !user ? "none" : "auto",
+              }}
+            >
+              <ThumbUpAlt fontSize="small" />
+              &nbsp; {post.likes.length} Like{post.likes.length > 1 ? "s" : ""}
             </Button>
-          )}
-        </CardActions>
+            {user?._id === post.creatorId && (
+              <Button color="warning" size="small" onClick={handleDeletePost}>
+                <Delete fontSize="small" />
+                Delete
+              </Button>
+            )}
+          </CardActions>
+        )}
       </Card>
 
       {modalOpen && (

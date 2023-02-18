@@ -7,26 +7,53 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Posts from "../../components/Posts/Posts";
 import Form from "../../components/Form/Form";
 import { useAppSelector } from "../../store/store";
-import { useLocation } from "react-router-dom";
-
-const useQuery = () => new URLSearchParams(useLocation().search);
+import { useGetPostsQuery } from "../../apis/postSlice";
+import { useDebounce, useQuery } from "../../hooks";
+import Pagination from "../../components/Pagination";
 
 function Home() {
   const query = useQuery();
-  const page = query.get("page") || 1;
-  const searchQuery = query.get("search");
-  // const history = useHistory()
+  const navigate = useNavigate();
+  const page = query.get("page") || "1";
+  const searchQuery = query.get("search") || "";
+  const tagsQuery = query.get("tags") || "";
+  const [searchValue, setSearchValue] = useState(() => ({
+    text: searchQuery,
+    tags: tagsQuery ?? "",
+  }));
 
   const { user } = useAppSelector((state) => state.app);
   const [modalOpen, setModelOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState(() => ({
-    text: "",
-    tags: "",
+
+  const [queryValues, setQueryValues] = useState(() => ({
+    page,
+    text: searchQuery,
+    tags: tagsQuery ?? "",
   }));
+  const { data, isFetching } = useGetPostsQuery(queryValues);
+
+  useDebounce(handleNavigationAndQuery, 600, [
+    searchValue.text,
+    searchValue.tags,
+  ]);
+
+  function handleNavigationAndQuery(toPage?: string) {
+    navigate(
+      `/posts?page=${toPage ?? page}&search=${searchValue.text}&tags=${
+        searchValue.tags
+      }`
+    );
+    setQueryValues({
+      page: toPage ?? page,
+      text: searchValue.text,
+      tags: searchValue.tags,
+    });
+  }
 
   function handleModelOpen(value: boolean) {
     setModelOpen(value);
@@ -34,10 +61,6 @@ function Home() {
 
   function handleSearchTextChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }
-
-  function handleSearchMemory() {
-    const tags = searchValue.tags.split(" ,.");
   }
 
   return (
@@ -54,8 +77,7 @@ function Home() {
             variant="outlined"
             name="text"
             value={searchValue.text}
-            label="Memory name"
-            onKeyDown={(e) => (e.key === "Enter" ? handleSearchMemory() : null)}
+            label="Search by name"
             onChange={handleSearchTextChange}
             sx={{ width: "270px", minWidth: "200px" }}
           />
@@ -63,18 +85,10 @@ function Home() {
             variant="outlined"
             name="tags"
             value={searchValue.tags}
-            label="Memory tag(s) (separated by . , or space)"
-            onKeyDown={(e) => (e.key === "Enter" ? handleSearchMemory() : null)}
+            label="Search by tag(s) (separated by . , or space)"
             onChange={handleSearchTextChange}
             sx={{ width: "270px", minWidth: "200px" }}
           />
-          <Button
-            onClick={() => {
-              handleSearchMemory();
-            }}
-          >
-            Search
-          </Button>
 
           {user ? (
             <>
@@ -94,7 +108,13 @@ function Home() {
           )}
         </Box>
 
-        <Posts />
+        <Pagination
+          count={data?.numOfPages}
+          page={+page}
+          onPageChange={handleNavigationAndQuery}
+        />
+
+        <Posts posts={data?.posts} isFetching={isFetching} />
       </Container>
     </Grow>
   );

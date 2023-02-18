@@ -38,10 +38,12 @@ function Navbar() {
 
   return (
     <AppBar position="static" color="inherit" sx={{ py: 2 }}>
-      <Heading variant="h2" align="left">
-        Memories
-      </Heading>
-      <Image src={MEMORIES} alt="memories" height={60} width={60} />
+      <Link to="/posts">
+        <Heading variant="h2" align="left">
+          Memories
+        </Heading>
+        <Image src={MEMORIES} alt="memories" height={60} width={60} />
+      </Link>
       <Toolbar>
         {currentUser ? (
           <>

@@ -5,18 +5,38 @@ const BASE_PATH = "/posts";
 
 const postSlice = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getPosts: builder.query<Post[], void>({
-      query: () => ({
-        url: `${BASE_PATH}`,
+    getPosts: builder.query<GetPostsResponse, GetPostsPayload>({
+      query: ({ page, text, tags }) => ({
+        url: `${BASE_PATH}?page=${page}&search=${text || ""}&tags=${
+          tags || ""
+        }`,
       }),
       providesTags: [queryTagTypes.POST],
     }),
+
+    getOnePost: builder.query<{ post: Post; recommendedPosts: Post[] }, string>(
+      {
+        query: (id) => ({
+          url: `${BASE_PATH}/${id}`,
+        }),
+        providesTags: [queryTagTypes.POST],
+      }
+    ),
 
     createPost: builder.mutation<void, Post>({
       query: (payload) => ({
         method: "POST",
         url: `${BASE_PATH}`,
         body: payload,
+      }),
+      invalidatesTags: [queryTagTypes.POST],
+    }),
+
+    commentPost: builder.mutation<void, { finalComment: string; id: string }>({
+      query: ({ finalComment, id }) => ({
+        method: "PATCH",
+        url: `${BASE_PATH}/${id}-commentPost`,
+        body: { comment: finalComment },
       }),
       invalidatesTags: [queryTagTypes.POST],
     }),
@@ -31,7 +51,7 @@ const postSlice = baseApi.injectEndpoints({
 
     updatePost: builder.mutation<
       void,
-      { id: Post["_id"]; payload: PostPayload }
+      { id: Post["_id"]; payload: UpdatePostPayload }
     >({
       query: ({ id, payload }) => ({
         method: "PATCH",
@@ -55,7 +75,9 @@ export default postSlice;
 
 export const {
   useGetPostsQuery,
+  useGetOnePostQuery,
   useCreatePostMutation,
+  useCommentPostMutation,
   useLikePostMutation,
   useUpdatePostMutation,
   useDeletePostMutation,
