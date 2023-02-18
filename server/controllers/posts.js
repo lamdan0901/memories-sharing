@@ -2,10 +2,58 @@ import mongoose from "mongoose";
 import PostMessage from "../models/postMessage.js";
 
 export const getPosts = async (req, res) => {
-  try {
-    const postMessages = await PostMessage.find();
+  const { page, search, tags } = req.query;
+  const LIMIT = 6;
+  const title = new RegExp(search?.trim() || "", "i"); // 'flag = i' means ignore case
 
-    res.status(200).json(postMessages);
+  let posts,
+    filters = null;
+
+  try {
+    if (search && tags) {
+      filters = {
+        $and: [{ title }, { tags: { $in: tags.trim().split(/[ .,]/) } }],
+      };
+    } else if (search) {
+      filters = {
+        $and: [{ title }],
+      };
+    } else if (tags) {
+      filters = {
+        $and: [{ tags: { $in: tags.trim().split(/[ .,]/) } }],
+      };
+    }
+
+    const startIndex = (+page - 1) * LIMIT;
+    const total = await PostMessage.countDocuments({});
+
+    posts = await PostMessage.find(filters)
+      .sort({ createdAt: -1 })
+      .limit(LIMIT)
+      .skip(startIndex);
+
+    res.status(200).json({
+      posts,
+      currentPage: +page,
+      numOfPages: Math.ceil(total / LIMIT),
+    });
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+export const getOnePost = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const post = await PostMessage.findById(id);
+    const recommendedPosts = await PostMessage.find({
+      $and: [{ tags: { $in: post.tags } }, { _id: { $ne: post._id } }],
+    })
+      .sort({ createdAt: 1 })
+      .limit(4);
+
+    res.status(200).json({ post, recommendedPosts });
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -19,6 +67,27 @@ export const createPost = async (req, res) => {
     await newPost.save();
 
     res.status(201).json(newPost);
+  } catch (err) {
+    res.status(409).json({ message: err.message });
+  }
+};
+
+export const commentPost = async (req, res) => {
+  const { id: _id } = req.params;
+  const { comment } = req.body;
+
+  try {
+    const post = await PostMessage.findById(_id);
+    if (!post) return res.status(404).send("Post not found");
+
+    const updatedPost = await PostMessage.findByIdAndUpdate(
+      _id,
+      { ...post, comments: post.comments.push(comment) },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json(updatedPost);
   } catch (err) {
     res.status(409).json({ message: err.message });
   }
@@ -44,7 +113,7 @@ export const likePost = async (req, res) => {
 
   const likedPost = await PostMessage.findByIdAndUpdate(
     _id,
-    { ...post, _id },
+    { post },
     {
       new: true,
     }
@@ -61,7 +130,7 @@ export const updatePost = async (req, res) => {
 
   const updatedPost = await PostMessage.findByIdAndUpdate(
     _id,
-    { ...post, _id },
+    { post },
     {
       new: true, // return the object after update was applied.
     }
