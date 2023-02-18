@@ -14,10 +14,6 @@ import { useGetOnePostQuery } from "../../apis/postSlice";
 import Post from "../../components/Posts/Post/Post";
 import CommentSection from "./CommentSection";
 
-// interface PostDetailProps{
-
-// }
-
 function PostDetail() {
   const navigate = useNavigate();
   const { id } = useParams();

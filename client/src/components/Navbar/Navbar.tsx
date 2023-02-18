@@ -25,6 +25,7 @@ function Navbar() {
     let savedUser = localStorage.getItem("currentUser");
     if (savedUser) {
       savedUser = JSON.parse(savedUser);
+      //@ts-ignore
       setCurrentUser(savedUser);
       dispatch(setUser(savedUser));
     }

@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar/Navbar";
 
 const Auth = lazy(() => import("../pages/Auth/Auth"));
 const Home = lazy(() => import("../pages/Home/Home"));
+//@ts-ignore
 const PostDetail = lazy(() => import("../pages/PostDetail/PostDetail"));
 
 function App() {

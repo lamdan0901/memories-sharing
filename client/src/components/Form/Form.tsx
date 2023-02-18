@@ -27,6 +27,7 @@ const initialPost = {
   tags: [],
   selectedFile: "",
   likes: [],
+  comments: [],
 };
 
 interface FormModalProps {
