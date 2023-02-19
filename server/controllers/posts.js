@@ -111,13 +111,9 @@ export const likePost = async (req, res) => {
     post.likes.splice(index, 1); // dislike
   }
 
-  const likedPost = await PostMessage.findByIdAndUpdate(
-    _id,
-    { post },
-    {
-      new: true,
-    }
-  );
+  const likedPost = await PostMessage.findByIdAndUpdate(_id, post, {
+    new: true,
+  });
   res.status(200).json(likedPost);
 };
 
@@ -128,13 +124,9 @@ export const updatePost = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(_id))
     return res.status(404).send("Post not found");
 
-  const updatedPost = await PostMessage.findByIdAndUpdate(
-    _id,
-    { post },
-    {
-      new: true, // return the object after update was applied.
-    }
-  );
+  const updatedPost = await PostMessage.findByIdAndUpdate(_id, post, {
+    new: true, // return the object after update was applied.
+  });
   res.status(200).json(updatedPost);
 };
 
