@@ -3,11 +3,11 @@ import Post from "./Post/Post";
 
 interface PostsProps {
   posts?: Post[];
-  isFetching: boolean;
+  isLoading: boolean;
 }
 
-function Posts({ posts, isFetching }: PostsProps) {
-  if (isFetching) return <CircularProgress />;
+function Posts({ posts, isLoading }: PostsProps) {
+  if (isLoading) return <CircularProgress />;
 
   return (
     <Grid
@@ -19,6 +19,7 @@ function Posts({ posts, isFetching }: PostsProps) {
           justifyContent: "center",
         },
         mt: 0,
+        mb: 3.75,
       }}
     >
       {posts?.map((post) => (

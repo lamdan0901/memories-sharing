@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Posts from "../../components/Posts/Posts";
@@ -17,6 +17,9 @@ import { useDebounce, useQuery } from "../../hooks";
 import Pagination from "../../components/Pagination";
 
 function Home() {
+  const { user } = useAppSelector((state) => state.app);
+  const [modalOpen, setModelOpen] = useState(false);
+
   const query = useQuery();
   const navigate = useNavigate();
   const page = query.get("page") || "1";
@@ -27,20 +30,21 @@ function Home() {
     tags: tagsQuery ?? "",
   }));
 
-  const { user } = useAppSelector((state) => state.app);
-  const [modalOpen, setModelOpen] = useState(false);
-
   const [queryValues, setQueryValues] = useState(() => ({
     page,
     text: searchQuery,
     tags: tagsQuery ?? "",
   }));
-  const { data, isFetching } = useGetPostsQuery(queryValues);
+  const { data, isLoading } = useGetPostsQuery(queryValues);
 
   useDebounce(handleNavigationAndQuery, 600, [
     searchValue.text,
     searchValue.tags,
   ]);
+
+  useEffect(() => {
+    setQueryValues({ page, text: searchQuery, tags: tagsQuery });
+  }, [page, searchQuery, tagsQuery]);
 
   function handleNavigationAndQuery(toPage?: string) {
     navigate(
@@ -114,7 +118,7 @@ function Home() {
           onPageChange={handleNavigationAndQuery}
         />
 
-        <Posts posts={data?.posts} isFetching={isFetching} />
+        <Posts posts={data?.posts} isLoading={isLoading} />
       </Container>
     </Grow>
   );

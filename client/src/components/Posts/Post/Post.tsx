@@ -59,28 +59,24 @@ function Post({ post, isRecommended }: PostProps) {
       .catch((err) => console.log(err));
   }
 
+  function viewPostDetail() {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+    navigate(`/posts/${post._id}`);
+  }
+
   return (
     <>
       <Card>
         <CardMedia
           component="img"
-          onClick={() => navigate(`/posts/${post._id}`)}
+          onClick={viewPostDetail}
           image={post.selectedFile}
           alt="error while loading image"
-          sx={{
-            cursor: "pointer",
-            transform: "scale(1)",
-            transition: "all 0.2s ease-out",
-            "&:hover": {
-              transform: "scale(1.2)",
-            },
-            "&.MuiCardMedia-img": {
-              maxHeight: "450px",
-              "@media (min-width: 600px)": {
-                maxHeight: "300px",
-              },
-            },
-          }}
+          sx={cardMediaStyle}
         />
 
         {!isRecommended && (
@@ -163,3 +159,18 @@ function Post({ post, isRecommended }: PostProps) {
 }
 
 export default Post;
+
+const cardMediaStyle = {
+  cursor: "pointer",
+  transform: "scale(1)",
+  transition: "all 0.2s ease-out",
+  "&:hover": {
+    transform: "scale(1.2)",
+  },
+  "&.MuiCardMedia-img": {
+    maxHeight: "450px",
+    "@media (min-width: 600px)": {
+      maxHeight: "300px",
+    },
+  },
+};
