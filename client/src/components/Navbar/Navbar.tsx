@@ -33,13 +33,12 @@ function Navbar() {
 
   function logOut() {
     localStorage.clear();
-    setCurrentUser(null);
     navigate("/auth", { replace: true });
   }
 
   return (
     <AppBar position="static" color="inherit" sx={{ py: 2 }}>
-      <Link to="/posts">
+      <Link to="/posts" style={{ display: "flex", textDecoration: "none" }}>
         <Heading variant="h2" align="left">
           Memories
         </Heading>
@@ -59,10 +58,11 @@ function Navbar() {
               {currentUser.firstName + " " + currentUser.lastName}
             </Typography>
             <Button
-              variant="contained"
+              variant="outlined"
               color="secondary"
               className="navbar__btn-logout"
               onClick={logOut}
+              sx={{ ml: 3 }}
             >
               Log out
             </Button>

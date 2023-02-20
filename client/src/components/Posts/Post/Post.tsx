@@ -1,4 +1,9 @@
-import { Delete, MoreHoriz, ThumbUpAlt } from "@mui/icons-material";
+import {
+  Delete,
+  MoreHoriz,
+  ThumbUpAlt,
+  ShareTwoTone,
+} from "@mui/icons-material";
 import {
   Button,
   CardContent,
@@ -59,6 +64,16 @@ function Post({ post, isRecommended }: PostProps) {
       .catch((err) => console.log(err));
   }
 
+  function handleSharePost() {
+    let port = "";
+    if (import.meta.env.VITE_USER_NODE_ENV === "local")
+      port = `:${location.port}`;
+
+    navigator.clipboard.writeText(
+      `${location.hostname}${port}/posts/${post._id}`
+    );
+  }
+
   function viewPostDetail() {
     window.scrollTo({
       top: 0,
@@ -106,7 +121,8 @@ function Post({ post, isRecommended }: PostProps) {
           anchorEl={anchorEl}
           onClose={handleCloseMenu}
         >
-          <MenuItem onClick={() => handleModelOpen(true)}>Edit Memory</MenuItem>
+          <MenuItem onClick={() => handleModelOpen(true)}>Edit</MenuItem>
+          <MenuItem onClick={handleDeletePost}>Delete</MenuItem>
         </Menu>
 
         <Typography sx={{ m: 2.5, fontSize: 12 }} color="textSecondary">
@@ -137,12 +153,10 @@ function Post({ post, isRecommended }: PostProps) {
               <ThumbUpAlt fontSize="small" />
               &nbsp; {post.likes.length} Like{post.likes.length > 1 ? "s" : ""}
             </Button>
-            {user?._id === post.creatorId && (
-              <Button color="warning" size="small" onClick={handleDeletePost}>
-                <Delete fontSize="small" />
-                Delete
-              </Button>
-            )}
+            <Button size="small" onClick={handleSharePost}>
+              <ShareTwoTone fontSize="small" />
+              &nbsp; Share
+            </Button>
           </CardActions>
         )}
       </Card>
