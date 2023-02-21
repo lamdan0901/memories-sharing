@@ -1,10 +1,6 @@
-# Client UI
-
-ref: https://github.com/adrianhajdin/project_mern_memories
-
 ## Name
 
-Client side for MERN App
+Client side for MEMORIES SHARING Web app
 
 ## Description
 
