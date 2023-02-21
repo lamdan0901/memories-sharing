@@ -1,9 +1,4 @@
-import {
-  Delete,
-  MoreHoriz,
-  ThumbUpAlt,
-  ShareTwoTone,
-} from "@mui/icons-material";
+import { MoreHoriz, ThumbUpAlt, ShareTwoTone } from "@mui/icons-material";
 import {
   Button,
   CardContent,
@@ -22,8 +17,9 @@ import {
   useDeletePostMutation,
 } from "../../../apis/postSlice";
 import { Card, CardActions, Overlay, Overlay2 } from "./Post.styled";
-import { useAppSelector } from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
+import { setSnackMsg } from "../../../App/App.reducer";
 
 interface PostProps {
   post: Post;
@@ -35,6 +31,7 @@ function Post({ post, isRecommended }: PostProps) {
   const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [modalOpen, setModelOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -53,15 +50,22 @@ function Post({ post, isRecommended }: PostProps) {
   }
 
   async function handleLikePost() {
-    await likePost(post._id as string)
-      .unwrap()
-      .catch((err) => console.log(err));
+    try {
+      await likePost(post._id as string).unwrap();
+    } catch (err) {
+      dispatch(setSnackMsg("Error occurred!"));
+      console.log(err);
+    }
   }
 
   async function handleDeletePost() {
-    await deletePost(post._id)
-      .unwrap()
-      .catch((err) => console.log(err));
+    try {
+      await deletePost(post._id).unwrap();
+      dispatch(setSnackMsg("Post deleted!"));
+    } catch (err) {
+      dispatch(setSnackMsg("Error occurred!"));
+      console.log(err);
+    }
   }
 
   function handleSharePost() {
@@ -125,7 +129,7 @@ function Post({ post, isRecommended }: PostProps) {
           <MenuItem onClick={handleDeletePost}>Delete</MenuItem>
         </Menu>
 
-        <Typography sx={{ m: 2.5, fontSize: 12 }} color="textSecondary">
+        <Typography sx={{ m: 2.5, fontSize: 12 }} color="#242fd0">
           {(post.tags as string[]).map((tag) => {
             return tag ? `#${tag} ` : "";
           })}

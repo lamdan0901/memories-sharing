@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "../components/Navbar/Navbar";
+import Snackbar from "../components/Snackbar/Snackbar";
 
 const Auth = lazy(() => import("../pages/Auth/Auth"));
 const Home = lazy(() => import("../pages/Home/Home"));
@@ -23,6 +24,8 @@ function App() {
             <Route path="/auth" element={<Auth />} />
           </Routes>
         </Suspense>
+
+        <Snackbar />
       </BrowserRouter>
     </Container>
   );

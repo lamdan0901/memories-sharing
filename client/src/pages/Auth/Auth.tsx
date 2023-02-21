@@ -11,7 +11,7 @@ import {
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogInMutation, useSignUpMutation } from "../../apis/authSlice";
-import { setUser } from "../../App/App.reducer";
+import { setSnackMsg, setUser } from "../../App/App.reducer";
 import { useAppDispatch } from "../../store/store";
 
 const initialData = {
@@ -45,6 +45,7 @@ function Auth() {
 
         setFormData(initialData);
         setIsSignUp(false);
+        dispatch(setSnackMsg("Sign up successfully!"));
         return;
       }
 
@@ -54,8 +55,10 @@ function Auth() {
       localStorage.setItem("currentUser", JSON.stringify(res.currentUser));
       dispatch(setUser(res.currentUser));
       setFormData(initialData);
+      dispatch(setSnackMsg("Log in successfully!"));
       navigate("/");
     } catch (err) {
+      dispatch(setSnackMsg("Error occurred!"));
       console.log("err: ", err);
     }
   }

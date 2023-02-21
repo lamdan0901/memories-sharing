@@ -35,13 +35,13 @@ function PostDetail() {
         </div>
 
         <section>
-          <Typography variant="h3" component="h2">
-            {post.title}
-          </Typography>
-          <Typography sx={{ m: 2.5, fontSize: 12 }} color="textSecondary">
+          <Typography sx={{ m: 2.5, fontSize: 12 }} color="#242fd0">
             {(post.tags as string[]).map((tag) => {
               return tag ? `#${tag} ` : "";
             })}
+          </Typography>
+          <Typography variant="h3" component="h2">
+            {post.title}
           </Typography>
           <Typography variant="body1" component="p" gutterBottom>
             {post.message}
@@ -58,7 +58,7 @@ function PostDetail() {
           <Divider sx={{ my: 2.5 }} />
         </section>
 
-        {recommendedPosts && (
+        {recommendedPosts.length > 0 && (
           <section>
             <Typography variant="h5" gutterBottom>
               You might also like:

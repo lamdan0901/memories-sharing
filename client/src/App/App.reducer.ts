@@ -1,18 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface AppState {
-  // currentPost: PostPayload | null;
   user: User | null;
+  snackMsg: string;
 }
 
 const initialState: AppState = {
-  // currentPost: {
-  //   creator: "",
-  //   title: "",
-  //   message: "",
-  //   tags: [],
-  //   selectedFile: "",
-  // },
+  snackMsg: "",
   user: null,
 };
 
@@ -20,17 +14,17 @@ export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
-    // setCurrentPost(state, action) {
-    //   state.currentPost = action.payload;
-    // },
     setUser(state, action) {
       state.user = action.payload;
+    },
+    setSnackMsg(state, action) {
+      state.snackMsg = action.payload;
     },
   },
 });
 
 export const appReducer = appSlice.reducer;
 
-export const { setUser } = appSlice.actions;
+export const { setUser, setSnackMsg } = appSlice.actions;
 
 export default appSlice.reducer;

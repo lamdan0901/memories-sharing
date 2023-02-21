@@ -3,7 +3,7 @@ import PostMessage from "../models/postMessage.js";
 
 export const getPosts = async (req, res) => {
   const { page, search, tags } = req.query;
-  const LIMIT = 6;
+  const LIMIT = 8;
   const title = new RegExp(search?.trim() || "", "i"); // 'flag = i' means ignore case
 
   let posts,

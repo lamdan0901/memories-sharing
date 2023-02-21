@@ -15,10 +15,6 @@ interface CommentSectionProps {
   post: Post;
 }
 
-// in the future, if I have time, I will implement more for this and other sections
-// such as 'like comment, commentTime, rep to a cmt, lazy-loading-pagination for comment section,
-//  show the user's avatar, set up user profile ...'
-
 function CommentSection({ post }: CommentSectionProps) {
   let currentUser: User | null = null;
   const savedUser = localStorage.getItem("currentUser");
@@ -55,9 +51,7 @@ function CommentSection({ post }: CommentSectionProps) {
           })}
         </Box>
 
-        <Divider sx={{ my: 2 }} />
-
-        <Box>
+        <Box mt={2}>
           <Typography variant="h6" gutterBottom>
             Write a comment
           </Typography>

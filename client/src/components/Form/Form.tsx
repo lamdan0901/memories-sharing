@@ -17,7 +17,8 @@ import {
   useUpdatePostMutation,
 } from "../../apis/postSlice";
 import { FileInput, FormWrapper } from "./Form.styled";
-import { useAppSelector } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { setSnackMsg } from "../../App/App.reducer";
 
 const initialPost = {
   creator: "",
@@ -38,8 +39,9 @@ interface FormModalProps {
 
 function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
   const { user } = useAppSelector((state) => state.app);
-  const [createPost] = useCreatePostMutation();
-  const [updatePost] = useUpdatePostMutation();
+  const dispatch = useAppDispatch();
+  const [createPost, { status: createPostStatus }] = useCreatePostMutation();
+  const [updatePost, { status: updatePostStatus }] = useUpdatePostMutation();
   const [post, setPost] = useState<Post>(() =>
     _post
       ? {
@@ -56,6 +58,11 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
       post.tags = post.tags.trim().split(/[ .,]/);
     }
 
+    if (post.title.trim() === "") {
+      dispatch(setSnackMsg("Title is required!"));
+      return;
+    }
+
     try {
       if (!_post) {
         await createPost({
@@ -67,10 +74,12 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
         await updatePost({ id: post._id, payload: post }).unwrap();
       }
 
+      dispatch(setSnackMsg("Submitted changes"));
       setPost(initialPost);
       onModelOpen(false);
     } catch (err) {
       console.log(err);
+      dispatch(setSnackMsg("Changes not submitted, error occurred!"));
     }
   }
 
@@ -104,6 +113,7 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
 
               <TextField
                 name="title"
+                required
                 variant="outlined"
                 label="Title"
                 fullWidth
@@ -159,6 +169,10 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                 variant="contained"
                 color="primary"
                 size="large"
+                disabled={
+                  createPostStatus === "pending" ||
+                  updatePostStatus === "pending"
+                }
                 fullWidth
               >
                 Submit

@@ -5,7 +5,7 @@ import jwt_decode from "jwt-decode";
 import MEMORIES from "../../assets/imgs/memories.png";
 import { AppBar, Heading, Image } from "./Navbar.styled";
 import { useAppDispatch } from "../../store/store";
-import { setUser } from "../../App/App.reducer";
+import { setSnackMsg, setUser } from "../../App/App.reducer";
 import { useLayoutEffect, useState } from "react";
 
 function Navbar() {
@@ -34,6 +34,8 @@ function Navbar() {
   function logOut() {
     localStorage.clear();
     navigate("/auth", { replace: true });
+
+    dispatch(setSnackMsg("You've logged out!"));
   }
 
   return (
