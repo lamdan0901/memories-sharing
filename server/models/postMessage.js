@@ -9,7 +9,8 @@ const postSchema = mongoose.Schema({
   selectedFile: String,
   comments: { type: [String], default: [] },
   likes: {
-    type: [String],
+    type: [mongoose.SchemaTypes.ObjectId],
+    ref: "User",
     default: [],
   },
   createdAt: {
@@ -17,6 +18,14 @@ const postSchema = mongoose.Schema({
     default: new Date(),
   },
 });
+
+postSchema.methods.sayHi = function () {
+  console.log("Say hi ", this.title);
+};
+
+postSchema.statics.findByTitle = function (name) {
+  return this.where({ title: new RegExp(name, "i") });
+};
 
 const PostMessage = mongoose.model("PostMessage", postSchema);
 export default PostMessage;
