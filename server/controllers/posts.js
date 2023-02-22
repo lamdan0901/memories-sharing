@@ -59,7 +59,7 @@ export const getOnePost = async (req, res) => {
     //   .where("creator")
     //   .equals("creator")
     //   .select("title, creator")
-    //   .populate("User");
+    //   .populate("likes");
 
     res.status(200).json({ post, recommendedPosts });
   } catch (err) {
