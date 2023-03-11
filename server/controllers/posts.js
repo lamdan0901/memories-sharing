@@ -53,6 +53,14 @@ export const getOnePost = async (req, res) => {
       .sort({ createdAt: 1 })
       .limit(4);
 
+    // another way to query with conditions
+    // await PostMessage.where("title")
+    //   .equals("title")
+    //   .where("creator")
+    //   .equals("creator")
+    //   .select("title, creator")
+    //   .populate("likes");
+
     res.status(200).json({ post, recommendedPosts });
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -65,6 +73,8 @@ export const createPost = async (req, res) => {
   try {
     const newPost = new PostMessage(post);
     await newPost.save();
+
+    // the 2 lines above is equal to this: const newPost = await PostMessage.create(post);
 
     res.status(201).json(newPost);
   } catch (err) {
