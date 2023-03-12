@@ -3,11 +3,10 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
 export const logIn = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
-  // of course we should return the same message for both wrong email and password, we do this for dev purpose
   try {
-    const currentUser = await User.findOne({ email });
+    const currentUser = await User.findOne({ username });
     if (!currentUser)
       return res.status(404).json({ message: "User not exist" });
 
@@ -18,13 +17,19 @@ export const logIn = async (req, res) => {
     if (!isPasswordCorrect)
       return res.status(400).json({ message: "Invalid credential" });
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { email: currentUser.email, id: currentUser._id },
       process.env.SECRET_KEY,
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ currentUser, token });
+    const refreshToken = jwt.sign(
+      { email: currentUser.email },
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({ currentUser, accessToken, refreshToken });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Internal server error" });
@@ -32,7 +37,7 @@ export const logIn = async (req, res) => {
 };
 
 export const signUp = async (req, res) => {
-  const { email, password, firstName, lastName } = req.body;
+  const { email, password, username, firstName, lastName } = req.body;
 
   const userExisted = await User.findOne({ email });
   if (userExisted)
@@ -46,8 +51,9 @@ export const signUp = async (req, res) => {
       password: hashedPassword,
       firstName,
       lastName,
+      username,
     });
-    res.status(201).json({ message: "User created", result });
+    res.status(201).json({ result });
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: err._message });

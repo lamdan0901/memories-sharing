@@ -31,7 +31,7 @@ postSchema.pre("findByIdAndUpdate", function (next) {
 });
 
 // this will be call after the 'save' or whatever function exec
-postSchema.pre("findByIdAndUpdate", function (doc, next) {
+postSchema.post("findByIdAndUpdate", function (doc, next) {
   doc.sayHi(); //doc is just the saved object
   next();
 });

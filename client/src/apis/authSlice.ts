@@ -8,7 +8,7 @@ const authSlice = baseApi.injectEndpoints({
     logIn: builder.mutation<any, any>({
       query: (payload) => ({
         method: "POST",
-        url: `${BASE_PATH}/log-in`,
+        url: `${BASE_PATH}/login`,
         body: payload,
       }),
       invalidatesTags: [queryTagTypes.POST],
@@ -17,7 +17,7 @@ const authSlice = baseApi.injectEndpoints({
     signUp: builder.mutation<void, any>({
       query: (payload) => ({
         method: "POST",
-        url: `${BASE_PATH}/sign-up`,
+        url: `${BASE_PATH}/signup`,
         body: payload,
       }),
     }),

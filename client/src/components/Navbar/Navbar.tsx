@@ -14,20 +14,24 @@ function Navbar() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useLayoutEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decodedToken = jwt_decode(token);
-      if ((decodedToken as any).exp * 1000 < new Date().getTime()) {
-        localStorage.clear();
-      }
-    } else return;
+    try {
+      const token = localStorage.getItem("token");
+      if (token !== null && token !== "undefined") {
+        const decodedToken = jwt_decode(token);
+        if ((decodedToken as any).exp * 1000 < new Date().getTime()) {
+          localStorage.clear();
+        }
+      } else return;
 
-    let savedUser = localStorage.getItem("currentUser");
-    if (savedUser) {
-      savedUser = JSON.parse(savedUser);
-      //@ts-ignore
-      setCurrentUser(savedUser);
-      dispatch(setUser(savedUser));
+      let savedUser = localStorage.getItem("currentUser");
+      if (savedUser) {
+        savedUser = JSON.parse(savedUser);
+        //@ts-ignore
+        setCurrentUser(savedUser);
+        dispatch(setUser(savedUser));
+      }
+    } catch (err) {
+      console.log("err: ", err);
     }
   }, [location.href]);
 

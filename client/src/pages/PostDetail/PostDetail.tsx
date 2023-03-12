@@ -20,7 +20,12 @@ function PostDetail() {
   const { data, isLoading } = useGetOnePostQuery(id ?? "");
 
   if (isLoading) return <CircularProgress />;
-  if (!data) return "Error occurred!";
+  if (!data)
+    return (
+      <Typography variant="body1" component="p" color="red">
+        Error occurred!
+      </Typography>
+    );
 
   const { post, recommendedPosts } = data;
 
@@ -30,7 +35,11 @@ function PostDetail() {
         <Button onClick={() => navigate(-1)}>Back</Button>
         <Button onClick={() => navigate("/posts")}>Home</Button>
         <div>
-          <img src={post.selectedFile || ""} alt="error while loading image" />
+          <img
+            src={post.selectedFile || ""}
+            style={{ maxWidth: "700px" }}
+            alt="error while loading image"
+          />
           <Divider sx={{ my: 2.5 }} />
         </div>
 

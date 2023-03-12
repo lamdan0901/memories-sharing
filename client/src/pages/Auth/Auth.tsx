@@ -51,7 +51,7 @@ function Auth() {
 
       const res = await logIn(formData).unwrap();
 
-      localStorage.setItem("token", res.token);
+      localStorage.setItem("token", res.accessToken);
       localStorage.setItem("currentUser", JSON.stringify(res.currentUser));
       dispatch(setUser(res.currentUser));
       setFormData(initialData);
