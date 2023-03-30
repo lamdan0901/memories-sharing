@@ -1,11 +1,19 @@
-import express from "express";
-import { logIn, signUp } from "../controllers/users.controller.js";
-import { refreshToken } from "../controllers/token.controller.js";
+const express = require("express");
 
-const router = express.Router();
+const {
+  logIn,
+  signUp,
+  verifyEmail,
+  resendCode,
+} = require("../controllers/users.controller");
+const { refreshToken } = require("../controllers/token.controller");
 
-router.post("/login", logIn);
-router.post("/signup", signUp);
-router.post("/refresh-token", refreshToken);
+const usersRoutes = express.Router();
 
-export default router;
+usersRoutes.post("/login", logIn);
+usersRoutes.post("/signup", signUp);
+usersRoutes.post("/verify-email", verifyEmail);
+usersRoutes.post("/resend-code", resendCode);
+usersRoutes.post("/refresh-token", refreshToken);
+
+module.exports = usersRoutes;

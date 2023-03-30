@@ -1,27 +1,22 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const postSchema = mongoose.Schema({
-  title: String,
-  message: String,
-  creator: String,
-  creatorId: String,
-  tags: [String],
-  selectedFile: String,
-  comments: { type: [String], default: [] },
-  likes: {
-    type: [mongoose.SchemaTypes.ObjectId],
-    ref: "User",
-    default: [],
+const postSchema = mongoose.Schema(
+  {
+    title: String,
+    message: String,
+    creator: String,
+    creatorId: String,
+    tags: [String],
+    selectedFile: String,
+    comments: { type: [String], default: [] },
+    likes: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: "User",
+      default: [],
+    },
   },
-  createdAt: {
-    type: Date,
-    default: new Date(),
-  },
-  updatedAt: {
-    type: Date,
-    default: () => Date.now(),
-  },
-});
+  { timestamps: true }
+);
 
 // this will be call before the 'save' or whatever function exec
 postSchema.pre("findByIdAndUpdate", function (next) {
@@ -59,5 +54,4 @@ postSchema.query.byCreator = function (creator) {
 //     User.findByTitle("title")
 //   const user = User.find({...}); user.sayHi(); user.titleAndCreator;
 
-const PostMessage = mongoose.model("PostMessage", postSchema);
-export default PostMessage;
+module.exports = mongoose.model("PostMessage", postSchema);

@@ -1,19 +1,12 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const performanceSchema = mongoose.Schema({
-  time: String,
-  isChecked: Boolean,
-  habitId: { type: mongoose.SchemaTypes.ObjectId, ref: "Habit" },
-  createdAt: {
-    type: Date,
-    immutable: true,
-    default: new Date(),
+const performanceSchema = mongoose.Schema(
+  {
+    time: String,
+    isChecked: Boolean,
+    habitId: { type: mongoose.SchemaTypes.ObjectId, ref: "Habit" },
   },
-  updatedAt: {
-    type: Date,
-    default: new Date(),
-  },
-});
+  { timestamps: true }
+);
 
-const Performance = mongoose.model("Performance", performanceSchema);
-export default Performance;
+module.exports = mongoose.model("Performance", performanceSchema);

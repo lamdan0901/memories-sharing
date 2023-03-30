@@ -1,22 +1,19 @@
-import express from "express";
-import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import cors from "cors";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config({ path: __dirname + "/.env" });
 
-import postRoutes from "./routes/posts.js";
-import authRoutes from "./routes/users.js";
-import habitRoutes from "./routes/habits.js";
+const postRoutes = require("./routes/posts");
+const authRoutes = require("./routes/users");
+const habitRoutes = require("./routes/habits");
 
-dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 const app = express();
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
-app.use(cookieParser());
 
 app.use("/api/posts", postRoutes);
 app.use("/api/auth", authRoutes);

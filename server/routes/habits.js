@@ -1,21 +1,21 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   getAllHabits,
   createHabit,
   updateHabit,
   deleteHabit,
   createInspection,
   updateInspection,
-} from "../controllers/habits.controller.js";
-import auth from "../middleware/auth.js";
+} = require("../controllers/habits.controller");
+const auth = require("../middleware/auth");
 
-const router = express.Router();
+const habitsRoutes = express.Router();
 
-router.get("/", auth, getAllHabits);
-router.post("/", auth, createHabit);
-router.post("/inspection", auth, createInspection);
-router.patch("/:id", auth, updateHabit);
-router.patch("/inspection/:id", auth, updateInspection);
-router.delete("/:id", auth, deleteHabit);
+habitsRoutes.get("/", auth, getAllHabits);
+habitsRoutes.post("/", auth, createHabit);
+habitsRoutes.post("/inspection", auth, createInspection);
+habitsRoutes.patch("/:id", auth, updateHabit);
+habitsRoutes.patch("/inspection/:id", auth, updateInspection);
+habitsRoutes.delete("/:id", auth, deleteHabit);
 
-export default router;
+module.exports = habitsRoutes;
