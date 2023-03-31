@@ -10,11 +10,12 @@ const {
   deletePost,
 } = require("../controllers/posts.controller");
 const auth = require("../middleware/auth");
+const optionalAuth = require("../middleware/optionalAuth");
 
 const postsRoutes = express.Router();
 
-postsRoutes.get("/", getPosts);
-postsRoutes.get("/:id", getOnePost);
+postsRoutes.get("/", optionalAuth, getPosts);
+postsRoutes.get("/:id", optionalAuth, getOnePost);
 postsRoutes.post("/", auth, createPost);
 postsRoutes.patch("/:id-likePost", auth, likePost);
 postsRoutes.patch("/:id-commentPost", auth, commentPost);

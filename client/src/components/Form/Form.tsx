@@ -10,6 +10,9 @@ import {
   Modal,
   Fade,
   CardMedia,
+  Checkbox,
+  FormControlLabel,
+  Stack,
 } from "@mui/material";
 
 import {
@@ -17,14 +20,13 @@ import {
   useUpdatePostMutation,
 } from "../../apis/postSlice";
 import { FileInput, FormWrapper } from "./Form.styled";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import { useAppDispatch } from "../../store/store";
 import { setSnackMsg } from "../../App/App.reducer";
 
 const initialPost = {
-  creator: "",
-  creatorId: "",
   title: "",
   message: "",
+  isPrivate: false,
   tags: [],
   selectedFile: "",
   likes: [],
@@ -38,7 +40,6 @@ interface FormModalProps {
 }
 
 function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
-  const { user } = useAppSelector((state) => state.app);
   const dispatch = useAppDispatch();
   const [createPost, { status: createPostStatus }] = useCreatePostMutation();
   const [updatePost, { status: updatePostStatus }] = useUpdatePostMutation();
@@ -65,11 +66,7 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
 
     try {
       if (!_post) {
-        await createPost({
-          ...post,
-          creator: `${user?.firstName} ${user?.lastName}`,
-          creatorId: user?._id as string,
-        }).unwrap();
+        await createPost(post).unwrap();
       } else {
         await updatePost({ id: post._id, payload: post }).unwrap();
       }
@@ -86,7 +83,8 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
   function handleFormInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setPost((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.name === "isPrivate" ? e.target.checked : e.target.value,
     }));
   }
 
@@ -140,6 +138,18 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                 onChange={handleFormInputChange}
               />
 
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={post.isPrivate}
+                    onChange={handleFormInputChange}
+                    name="isPrivate"
+                  />
+                }
+                label="Is private"
+                sx={{ width: "100%", mx: 0 }}
+              />
+
               <FileInput>
                 <FileBase
                   type="file"
@@ -164,40 +174,42 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                 />
               )}
 
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                size="large"
-                disabled={
-                  createPostStatus === "pending" ||
-                  updatePostStatus === "pending"
-                }
-                fullWidth
-              >
-                Submit
-              </Button>
+              <Stack direction="row" width="100%" gap={1.5}>
+                <Button
+                  type="button"
+                  variant="contained"
+                  color="secondary"
+                  fullWidth
+                  onClick={() => {
+                    onModelOpen(false);
+                    setPost(initialPost);
+                  }}
+                >
+                  Close
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  disabled={
+                    createPostStatus === "pending" ||
+                    updatePostStatus === "pending"
+                  }
+                  fullWidth
+                >
+                  Submit
+                </Button>
+              </Stack>
               <Button
                 type="button"
-                variant="contained"
+                variant="outlined"
                 color="warning"
                 fullWidth
                 onClick={() => setPost(initialPost)}
                 sx={{ marginY: 1.5 }}
               >
                 Clear
-              </Button>
-              <Button
-                type="button"
-                variant="contained"
-                color="secondary"
-                fullWidth
-                onClick={() => {
-                  onModelOpen(false);
-                  setPost(initialPost);
-                }}
-              >
-                Close
               </Button>
             </FormWrapper>
           </Paper>

@@ -5,9 +5,11 @@ import {
   Box,
   TextField,
   Typography,
+  FormControlLabel,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Switch from "@mui/material/Switch";
 
 import Posts from "../../components/Posts/Posts";
 import Form from "../../components/Form/Form";
@@ -25,6 +27,8 @@ function Home() {
   const page = query.get("page") || "1";
   const searchQuery = query.get("search") || "";
   const tagsQuery = query.get("tags") || "";
+
+  const [isMine, setIsMine] = useState(false);
   const [searchValue, setSearchValue] = useState(() => ({
     text: searchQuery,
     tags: tagsQuery ?? "",
@@ -32,6 +36,7 @@ function Home() {
 
   const [queryValues, setQueryValues] = useState(() => ({
     page,
+    isMine,
     text: searchQuery,
     tags: tagsQuery ?? "",
   }));
@@ -43,8 +48,8 @@ function Home() {
   ]);
 
   useEffect(() => {
-    setQueryValues({ page, text: searchQuery, tags: tagsQuery });
-  }, [page, searchQuery, tagsQuery]);
+    setQueryValues({ page, text: searchQuery, tags: tagsQuery, isMine });
+  }, [page, searchQuery, tagsQuery, isMine]);
 
   function handleNavigationAndQuery(toPage?: string) {
     navigate(
@@ -56,6 +61,7 @@ function Home() {
       page: toPage ?? page,
       text: searchValue.text,
       tags: searchValue.tags,
+      isMine,
     });
   }
 
@@ -66,6 +72,10 @@ function Home() {
   function handleSearchTextChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
+
+  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsMine(e.target.checked);
+  };
 
   return (
     <Grow in>
@@ -103,6 +113,16 @@ function Home() {
               >
                 Add a new memory
               </Button>
+              <FormControlLabel
+                label="My Memories"
+                control={
+                  <Switch
+                    checked={isMine}
+                    onChange={handleSwitchChange}
+                    inputProps={{ "aria-label": "controlled" }}
+                  />
+                }
+              />
               <Form modalOpen={modalOpen} onModelOpen={handleModelOpen} />
             </>
           ) : (

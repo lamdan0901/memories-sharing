@@ -12,7 +12,7 @@ const habitSchema = mongoose.Schema(
       default: [],
     },
     user: {
-      type: [mongoose.SchemaTypes.ObjectId],
+      type: mongoose.SchemaTypes.ObjectId,
       ref: "User",
       required: true,
     },

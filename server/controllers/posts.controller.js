@@ -3,32 +3,32 @@ const PostMessage = require("../models/postMessage");
 
 module.exports = {
   getPosts: async (req, res) => {
-    const { page, search, tags } = req.query;
-    const LIMIT = 8;
-    const title = new RegExp(search?.trim() || "", "i"); // 'flag = i' means case insensitive and allows matching partial words.
+    const { page, search, tags, isMine } = req.query;
 
-    let posts,
-      filters = null;
+    const LIMIT = 8;
+    const startIndex = (+page - 1) * LIMIT;
+    const filters = { $and: [{ isPrivate: false }] };
+
+    if (search) {
+      filters.$and.push({ title: { $regex: search?.trim(), $options: "i" } });
+    }
+
+    if (tags) {
+      filters.$and.push({ tags: { $in: tags?.trim()?.split(/[ .,]/) } });
+    }
+
+    if (isMine === "true") {
+      filters.$and.push({ creator: req.userId });
+
+      const i = filters.$and.findIndex((condition) => !condition.isPrivate);
+      filters.$and.splice(i, 1);
+    }
 
     try {
-      if (search && tags) {
-        filters = {
-          $and: [{ title }, { tags: { $in: tags.trim().split(/[ .,]/) } }],
-        };
-      } else if (search) {
-        filters = {
-          $and: [{ title }],
-        };
-      } else if (tags) {
-        filters = {
-          $and: [{ tags: { $in: tags.trim().split(/[ .,]/) } }],
-        };
-      }
+      const total = await PostMessage.countDocuments(filters);
 
-      const startIndex = (+page - 1) * LIMIT;
-      const total = await PostMessage.countDocuments({});
-
-      posts = await PostMessage.find(filters)
+      const posts = await PostMessage.find(filters)
+        .populate("creator")
         .sort({ createdAt: -1 })
         .limit(LIMIT)
         .skip(startIndex);
@@ -39,6 +39,7 @@ module.exports = {
         numOfPages: Math.ceil(total / LIMIT),
       });
     } catch (err) {
+      console.log("err: ", err);
       res.status(404).json({ message: err.message });
     }
   },
@@ -72,7 +73,7 @@ module.exports = {
     const post = req.body;
 
     try {
-      const newPost = new PostMessage(post);
+      const newPost = new PostMessage({ ...post, creator: req.userId });
       await newPost.save();
 
       // the 2 lines above is equal to this: const newPost = await PostMessage.create(post);

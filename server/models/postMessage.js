@@ -4,11 +4,14 @@ const postSchema = mongoose.Schema(
   {
     title: String,
     message: String,
-    creator: String,
-    creatorId: String,
     tags: [String],
+    isPrivate: { type: Boolean, default: false },
     selectedFile: String,
     comments: { type: [String], default: [] },
+    creator: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "User",
+    },
     likes: {
       type: [mongoose.SchemaTypes.ObjectId],
       ref: "User",

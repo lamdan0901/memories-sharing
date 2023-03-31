@@ -2,9 +2,9 @@ interface Post {
   _id?: string;
   comments: string[];
   title: string;
+  isPrivate: boolean;
   message: string;
-  creator: string;
-  creatorId: string;
+  creator?: User;
   tags: string[] | string;
   selectedFile: string;
   likes: string[];
@@ -15,6 +15,7 @@ interface GetPostsPayload {
   page: string;
   text?: string;
   tags?: string;
+  isMine?: boolean;
 }
 
 interface GetPostsResponse {

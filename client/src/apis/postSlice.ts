@@ -6,10 +6,10 @@ const BASE_PATH = "/posts";
 const postSlice = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getPosts: builder.query<GetPostsResponse, GetPostsPayload>({
-      query: ({ page, text, tags }) => ({
+      query: ({ page, text, tags, isMine }) => ({
         url: `${BASE_PATH}?page=${page}&search=${text || ""}&tags=${
           tags || ""
-        }`,
+        }&isMine=${isMine || false}`,
       }),
       providesTags: [queryTagTypes.POST],
     }),

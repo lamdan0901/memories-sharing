@@ -10,16 +10,16 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import Form from "../../Form/Form";
 import {
   useLikePostMutation,
   useDeletePostMutation,
 } from "../../../apis/postSlice";
 import { Card, CardActions, Overlay, Overlay2 } from "./Post.styled";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { useNavigate } from "react-router-dom";
 import { setSnackMsg } from "../../../App/App.reducer";
+import Form from "../../Form/Form";
 
 interface PostProps {
   post: Post;
@@ -66,6 +66,7 @@ function Post({ post, isRecommended }: PostProps) {
       dispatch(setSnackMsg("Error occurred!"));
       console.log(err);
     }
+    handleCloseMenu();
   }
 
   function handleSharePost() {
@@ -76,6 +77,8 @@ function Post({ post, isRecommended }: PostProps) {
     navigator.clipboard.writeText(
       `${location.hostname}${port}/posts/${post._id}`
     );
+
+    dispatch(setSnackMsg("Link copied to clipboard!"));
   }
 
   function viewPostDetail() {
@@ -101,7 +104,7 @@ function Post({ post, isRecommended }: PostProps) {
         {!isRecommended && (
           <Overlay>
             <Typography variant="h6" sx={{ textShadow: "0px 0px 8px #111" }}>
-              {post.creator}
+              {`${post.creator?.firstName} ${post.creator?.lastName}`}
             </Typography>
             <Typography fontSize={12} sx={{ textShadow: "0px 0px 5px #111" }}>
               {moment(post.createdAt).fromNow()}
@@ -109,7 +112,7 @@ function Post({ post, isRecommended }: PostProps) {
           </Overlay>
         )}
 
-        {user?._id === post.creatorId && !isRecommended && (
+        {user?._id === post?.creator?._id && !isRecommended && (
           <Overlay2>
             <IconButton
               sx={{ color: "white", background: "#22222238" }}
