@@ -38,14 +38,14 @@ module.exports = {
       res.status(200).json({ currentUser, accessToken, refreshToken });
     } catch (err) {
       console.log(err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(400).json({ message: "Unexpected error occurred" });
     }
   },
 
   signUp: async (req, res) => {
     const { email, password, username, firstName, lastName } = req.body;
 
-    const userExisted = await User.findOne({ email });
+    const userExisted = await User.findOne({ username, email });
     if (userExisted)
       return res.status(400).json({ message: "User already exists" });
 
@@ -66,7 +66,7 @@ module.exports = {
       res.status(201).json({ result });
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: err.message });
+      res.status(400).json({ message: "Unexpected error occurred" });
     }
   },
 

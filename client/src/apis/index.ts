@@ -25,9 +25,8 @@ const baseQuery: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
-> = async (args, api, extraOptions) => {
-  return await customBaseQuery(args, api, extraOptions);
-};
+> = async (args, api, extraOptions) =>
+  await customBaseQuery(args, api, extraOptions);
 
 const baseApi = createApi({
   reducerPath: EDT_BASE_API_REDUCER_KEY,

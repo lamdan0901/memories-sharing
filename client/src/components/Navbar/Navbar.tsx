@@ -37,8 +37,8 @@ function Navbar() {
 
   function logOut() {
     localStorage.clear();
+    setCurrentUser(null);
     navigate("/auth", { replace: true });
-
     dispatch(setSnackMsg("You've logged out!"));
   }
 

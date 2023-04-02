@@ -21,9 +21,30 @@ const authSlice = baseApi.injectEndpoints({
         body: payload,
       }),
     }),
+
+    verifyEmail: builder.mutation<void, any>({
+      query: (payload) => ({
+        method: "POST",
+        url: `${BASE_PATH}/verify-email`,
+        body: payload,
+      }),
+    }),
+
+    resendCode: builder.mutation<void, any>({
+      query: (payload) => ({
+        method: "POST",
+        url: `${BASE_PATH}/resend-code`,
+        body: payload,
+      }),
+    }),
   }),
 });
 
 export default authSlice;
 
-export const { useLogInMutation, useSignUpMutation } = authSlice;
+export const {
+  useLogInMutation,
+  useSignUpMutation,
+  useVerifyEmailMutation,
+  useResendCodeMutation,
+} = authSlice;

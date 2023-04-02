@@ -93,26 +93,22 @@ function Home() {
             value={searchValue.text}
             label="Search by name"
             onChange={handleSearchTextChange}
-            sx={{ width: "270px", minWidth: "200px" }}
+            sx={{
+              width: "270px",
+              minWidth: "200px",
+            }}
           />
           <TextField
             variant="outlined"
             name="tags"
             value={searchValue.tags}
-            label="Search by tag(s) (separated by . , or space)"
+            label="Search by tag(s)"
             onChange={handleSearchTextChange}
             sx={{ width: "270px", minWidth: "200px" }}
           />
 
           {user ? (
             <>
-              <Button
-                onClick={() => {
-                  setModelOpen(true);
-                }}
-              >
-                Add a new memory
-              </Button>
               <FormControlLabel
                 label="My Memories"
                 control={
@@ -123,6 +119,14 @@ function Home() {
                   />
                 }
               />
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setModelOpen(true);
+                }}
+              >
+                Add a new memory
+              </Button>
               <Form modalOpen={modalOpen} onModelOpen={handleModelOpen} />
             </>
           ) : (
