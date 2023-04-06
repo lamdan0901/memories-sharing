@@ -13,13 +13,6 @@ export const Card = styled(MUICard)`
 export const Overlay = styled.div`
   position: absolute;
   top: 20px;
-  left: 20px;
-  color: #fff;
-`;
-
-export const Overlay2 = styled.div`
-  position: absolute;
-  top: 20px;
   right: 20px;
   color: #fff;
 `;

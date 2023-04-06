@@ -8,7 +8,6 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import moment from "moment";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +15,7 @@ import {
   useLikePostMutation,
   useDeletePostMutation,
 } from "../../../../apis/postSlice";
-import { Card, CardActions, Overlay, Overlay2 } from "./Post.styled";
+import { Card, CardActions, Overlay } from "./Post.styled";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { setSnackMsg } from "../../../../App/App.reducer";
 import Form from "../../../../components/Form/Form";
@@ -102,7 +101,7 @@ function Post({ post, isRecommended }: PostProps) {
         />
 
         {user?._id === post?.creator?._id && !isRecommended && (
-          <Overlay2>
+          <Overlay>
             <IconButton
               sx={{ color: "white", background: "#22222238" }}
               size="small"
@@ -110,7 +109,7 @@ function Post({ post, isRecommended }: PostProps) {
             >
               <MoreHoriz fontSize="small" />
             </IconButton>
-          </Overlay2>
+          </Overlay>
         )}
 
         <Menu

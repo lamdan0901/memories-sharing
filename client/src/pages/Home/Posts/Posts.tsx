@@ -8,6 +8,7 @@ interface PostsProps {
 
 function Posts({ posts, isLoading }: PostsProps) {
   if (isLoading) return <CircularProgress />;
+  const n = posts?.length ?? 1;
 
   return (
     <Grid
@@ -22,11 +23,21 @@ function Posts({ posts, isLoading }: PostsProps) {
         mb: 3.75,
       }}
     >
-      {posts?.map((post) => (
-        <Grid key={post._id} item sm={6} md={4} lg={3}>
-          <Post post={post} />
-        </Grid>
-      ))}
+      <Grid item sm={6} md={4} lg={3} display="flex" flexDirection="column">
+        {posts?.slice(0, n / 3)?.map((post) => (
+          <Post key={post._id} post={post} />
+        ))}
+      </Grid>
+      <Grid item sm={6} md={4} lg={3} display="flex" flexDirection="column">
+        {posts?.slice(n / 3, (2 * n) / 3)?.map((post) => (
+          <Post key={post._id} post={post} />
+        ))}
+      </Grid>
+      <Grid item sm={6} md={4} lg={3} display="flex" flexDirection="column">
+        {posts?.slice((2 * n) / 3)?.map((post) => (
+          <Post key={post._id} post={post} />
+        ))}
+      </Grid>
     </Grid>
   );
 }
