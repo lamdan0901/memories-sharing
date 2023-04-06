@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Switch from "@mui/material/Switch";
 
-import Posts from "../../components/Posts/Posts";
+import Posts from "./Posts/Posts";
 import Form from "../../components/Form/Form";
 import { useAppSelector } from "../../store/store";
 import { useGetPostsQuery } from "../../apis/postSlice";

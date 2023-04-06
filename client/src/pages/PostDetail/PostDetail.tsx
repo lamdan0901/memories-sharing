@@ -11,7 +11,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useGetOnePostQuery } from "../../apis/postSlice";
-import Post from "../../components/Posts/Post/Post";
+import Post from "../Home/Posts/Post/Post";
 import CommentSection from "./CommentSection";
 
 function PostDetail() {
