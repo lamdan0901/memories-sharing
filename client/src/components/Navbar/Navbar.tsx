@@ -2,7 +2,6 @@ import { Avatar, Button, Toolbar, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 
-import MEMORIES from "../../assets/imgs/memories.png";
 import { AppBar, Heading, Image } from "./Navbar.styled";
 import { useAppDispatch } from "../../store/store";
 import { setSnackMsg, setUser } from "../../App/App.reducer";
@@ -48,19 +47,23 @@ function Navbar() {
         <Heading variant="h2" align="left">
           Memories
         </Heading>
-        <Image src={MEMORIES} alt="memories" height={60} width={60} />
+        <Image
+          src="src/assets/imgs/memories.png"
+          alt="memories"
+          height={60}
+          width={60}
+        />
       </Link>
+
       <Toolbar>
         {currentUser ? (
           <>
             <Avatar
               className="navbar__avatar"
               alt={currentUser.firstName}
-              src={""}
-            >
-              {currentUser?.firstName.charAt(0)}
-            </Avatar>
-            <Typography className="navbar__name" variant="h6">
+              src={"src/assets/imgs/avatar.png"}
+            ></Avatar>
+            <Typography className="navbar__name" variant="h6" sx={{ ml: 1 }}>
               {currentUser.firstName + " " + currentUser.lastName}
             </Typography>
             <Button
@@ -68,19 +71,17 @@ function Navbar() {
               color="secondary"
               className="navbar__btn-logout"
               onClick={logOut}
-              sx={{ ml: 3 }}
+              sx={{ ml: 4 }}
             >
               Log out
             </Button>
           </>
         ) : (
-          <>
-            <Link to="/auth">
-              <Button variant="contained" color="primary">
-                Log in
-              </Button>
-            </Link>
-          </>
+          <Link to="/auth">
+            <Button variant="contained" color="primary">
+              Log in
+            </Button>
+          </Link>
         )}
       </Toolbar>
     </AppBar>

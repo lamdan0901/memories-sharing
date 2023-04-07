@@ -6,6 +6,8 @@ import {
   TextField,
   Typography,
   FormControlLabel,
+  useTheme,
+  Stack,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +21,7 @@ import { useDebounce, useQuery } from "../../hooks";
 import Pagination from "../../components/Pagination";
 
 function Home() {
+  const theme = useTheme();
   const { user } = useAppSelector((state) => state.app);
   const [modalOpen, setModelOpen] = useState(false);
 
@@ -79,36 +82,66 @@ function Home() {
 
   return (
     <Grow in>
-      <Container sx={{ display: "flex", flexDirection: "column" }}>
+      <Container
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
         <Box
-          alignSelf="flex-end"
           display="flex"
-          justifyContent="space-between"
           alignItems="center"
           width="100%"
+          gap={3}
+          sx={{
+            [theme.breakpoints.down("md")]: {
+              flexDirection: "column",
+            },
+          }}
         >
-          <TextField
-            variant="outlined"
-            name="text"
-            value={searchValue.text}
-            label="Search by name"
-            onChange={handleSearchTextChange}
+          <Stack
+            flex={6}
+            width="100%"
+            justifyContent="space-between"
+            gap={3}
             sx={{
-              width: "270px",
-              minWidth: "200px",
+              [theme.breakpoints.up("sm")]: {
+                flexDirection: "row",
+              },
             }}
-          />
-          <TextField
-            variant="outlined"
-            name="tags"
-            value={searchValue.tags}
-            label="Search by tag(s)"
-            onChange={handleSearchTextChange}
-            sx={{ width: "270px", minWidth: "200px" }}
-          />
+          >
+            <TextField
+              variant="outlined"
+              name="text"
+              value={searchValue.text}
+              label="Search by name"
+              onChange={handleSearchTextChange}
+              fullWidth
+            />
+            <TextField
+              variant="outlined"
+              name="tags"
+              value={searchValue.tags}
+              label="Search by tag(s)"
+              onChange={handleSearchTextChange}
+              fullWidth
+            />
+          </Stack>
 
           {user ? (
-            <>
+            <Stack
+              flex={4}
+              gap={3}
+              width="100%"
+              justifyContent="flex-end"
+              direction="row"
+              sx={{
+                [theme.breakpoints.down("md")]: {
+                  justifyContent: "space-between",
+                },
+              }}
+            >
               <FormControlLabel
                 label="My Memories"
                 control={
@@ -128,7 +161,7 @@ function Home() {
                 Add a new memory
               </Button>
               <Form modalOpen={modalOpen} onModelOpen={handleModelOpen} />
-            </>
+            </Stack>
           ) : (
             <Typography color="#555">
               Please login to create or like a memory

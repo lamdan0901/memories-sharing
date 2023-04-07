@@ -1,5 +1,6 @@
 import { CircularProgress, Grid, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import Loading from "../../../components/Loading/Loading";
 import Post from "./Post/Post";
 
 interface PostsProps {
@@ -7,37 +8,36 @@ interface PostsProps {
   isLoading: boolean;
 }
 
-const splitArray = (arr: any[], len: number, parts: number) => {
+const splitArray = (posts: Post[], len: number, parts: number) => {
   const chunkSize = Math.ceil(len / parts);
   const chunks = [];
   for (let i = 0; i < len; i += chunkSize) {
-    chunks.push(arr.slice(i, i + chunkSize));
+    chunks.push(posts.slice(i, i + chunkSize));
   }
   return chunks;
 };
 
-function Posts({ posts, isLoading }: PostsProps) {
+function Posts({ posts = [], isLoading }: PostsProps) {
   const theme = useTheme();
-  if (isLoading) return <CircularProgress />;
-  const n = posts?.length ?? 1;
-
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between("md", "lg"));
-  const isLargeScreen = useMediaQuery(theme.breakpoints.between("lg", "xl"));
-  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up("xl"));
+  const isBelowSM = useMediaQuery(theme.breakpoints.down("sm"));
+  const isBetweenSmMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isBetweenMdLg = useMediaQuery(theme.breakpoints.between("md", "lg"));
+  const isAboveLg = useMediaQuery(theme.breakpoints.up("lg"));
 
   let parts = 1;
-  if (isSmallScreen) {
+  if (isBelowSM) {
     parts = 1;
-  } else if (isMediumScreen) {
+  } else if (isBetweenSmMd) {
     parts = 2;
-  } else if (isLargeScreen) {
+  } else if (isBetweenMdLg) {
     parts = 3;
-  } else if (isExtraLargeScreen) {
+  } else if (isAboveLg) {
     parts = 4;
   }
 
-  const splitPosts = splitArray(posts, n, parts);
+  const splitPosts = splitArray(posts, posts?.length, parts);
+
+  if (isLoading) return <Loading />;
 
   return (
     <Grid
@@ -52,7 +52,7 @@ function Posts({ posts, isLoading }: PostsProps) {
         mb: 3.75,
       }}
     >
-      {splitPosts.map((postsPart, i) => (
+      {splitPosts?.map((postsPart, i) => (
         <Grid
           gap={3}
           item

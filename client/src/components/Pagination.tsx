@@ -14,7 +14,7 @@ interface PaginationProps {
 function Pagination({ count = 5, page, onPageChange }: PaginationProps) {
   return (
     <MUIPagination
-      sx={{ mt: 3 }}
+      sx={{ mt: 3, mx: "auto" }}
       count={count}
       page={page}
       variant="outlined"
