@@ -1,28 +1,36 @@
 import {
+  Box,
   Button,
   Divider,
   Paper,
   Typography,
   CircularProgress,
   Grid,
+  Container,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PermMediaIcon from "@mui/icons-material/PermMedia";
 import moment from "moment";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useGetOnePostQuery } from "../../apis/postSlice";
-import Post from "../Home/Posts/Post/Post";
+import Post from "../../components/Post/Post";
 import CommentSection from "./CommentSection";
 
 function PostDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const theme = useTheme();
+  const isBelowMd = useMediaQuery(theme.breakpoints.down("md"));
   const { data, isLoading } = useGetOnePostQuery(id ?? "");
 
   if (isLoading) return <CircularProgress />;
   if (!data)
     return (
-      <Typography variant="body1" component="p" color="red">
+      <Typography variant="h1" color="red">
         Error occurred!
       </Typography>
     );
@@ -31,57 +39,88 @@ function PostDetail() {
 
   return (
     <Paper elevation={6} sx={{ p: 2.5, borderRadius: 3.75, mb: 3.75 }}>
-      <div>
-        <Button onClick={() => navigate(-1)}>Back</Button>
-        <Button onClick={() => navigate("/posts")}>Home</Button>
-        <div>
+      <Container>
+        <Box mb={2}>
+          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>
+            Back
+          </Button>
+          <Button
+            startIcon={<PermMediaIcon />}
+            onClick={() => navigate("/posts")}
+            sx={{ ml: 2 }}
+          >
+            Home
+          </Button>
+        </Box>
+
+        <Box
+          bgcolor="#eeeeff8c"
+          borderRadius={2.5}
+          flexDirection={isBelowMd ? "column" : "row"}
+          display="flex"
+          gap={isBelowMd ? 0 : 2}
+        >
           <img
             src={post.selectedFile || ""}
-            style={{ maxWidth: "700px" }}
             alt="error while loading image"
+            style={{
+              maxWidth: isBelowMd ? "100%" : "65%",
+              borderRadius: "10px",
+            }}
           />
-          <Divider sx={{ my: 2.5 }} />
-        </div>
 
-        <section>
-          <Typography sx={{ m: 2.5, fontSize: 12 }} color="#242fd0">
-            {(post.tags as string[]).map((tag) => {
-              return tag ? `#${tag} ` : "";
-            })}
-          </Typography>
-          <Typography variant="h3" component="h2">
-            {post.title}
-          </Typography>
-          <Typography variant="body1" component="p" gutterBottom>
-            {post.message}
-          </Typography>
-          <Typography variant="h6">{data.post.creator}</Typography>
-          <Typography variant="body2" component="h2">
-            {moment(data.post.createdAt).fromNow()}
-          </Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="space-between"
+            m={isBelowMd ? 2 : 0}
+            mt={2}
+          >
+            <Box>
+              <Typography variant={isBelowMd ? "h5" : "h4"} component="h2">
+                {post.title}
+              </Typography>
+              <Typography variant="body1" component="p" gutterBottom>
+                {post.message}
+              </Typography>
+              <Typography fontSize={14} component="p" color="textSecondary">
+                by{" "}
+                <i>{`${post.creator?.firstName} ${post.creator?.lastName}`}</i>
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="h2">
+                {moment(data.post.createdAt).fromNow()}
+              </Typography>
+            </Box>
 
-          <Divider sx={{ my: 2.5 }} />
+            <Typography sx={{ my: 2, fontSize: 12 }} color="#7063e5">
+              {(post.tags as string[]).map((tag) => {
+                return tag ? `#${tag} ` : "";
+              })}
+            </Typography>
+          </Box>
+        </Box>
 
-          <CommentSection post={post} />
+        <Divider sx={{ my: 2.5 }} />
 
-          <Divider sx={{ my: 2.5 }} />
-        </section>
+        <CommentSection post={post} />
+
+        <Divider sx={{ my: 2.5 }} />
 
         {recommendedPosts.length > 0 && (
-          <section>
+          <Box mb={2.5}>
             <Typography variant="h5" gutterBottom>
-              You might also like:
+              You might also like
             </Typography>
-            <Grid container spacing={2}>
+            <Grid alignItems="flex-start" container spacing={2}>
               {recommendedPosts.map((post: Post) => (
                 <Grid key={post._id} item sm={6} md={3}>
                   <Post isRecommended post={post} />
                 </Grid>
               ))}
             </Grid>
-          </section>
+          </Box>
         )}
-      </div>
+      </Container>
     </Paper>
   );
 }

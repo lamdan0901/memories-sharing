@@ -1,43 +1,44 @@
-import { CircularProgress, Grid, useMediaQuery } from "@mui/material";
+import { Grid, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import Loading from "../../../components/Loading/Loading";
-import Post from "./Post/Post";
+
+import Post from "../../../components/Post/Post";
 
 interface PostsProps {
   posts?: Post[];
-  isLoading: boolean;
 }
 
-const splitArray = (posts: Post[], len: number, parts: number) => {
-  const chunkSize = Math.ceil(len / parts);
+const splitArray = (posts: Post[], parts: number) => {
+  const chunkSize = Math.round(posts.length / parts) || 1; // to avoid chunkSize = 0
   const chunks = [];
-  for (let i = 0; i < len; i += chunkSize) {
+
+  for (let i = 0; i < posts.length; i += chunkSize) {
     chunks.push(posts.slice(i, i + chunkSize));
   }
+
+  if (posts.length === 6 && parts === 4) {
+    chunks
+      .splice(2)
+      .flat()
+      .forEach((chunk) => {
+        chunks.push([chunk]);
+      });
+  }
+
+  if (posts.length === 4 && parts === 3) {
+    chunks.unshift(chunks.splice(2).flat());
+  }
+
   return chunks;
 };
 
-function Posts({ posts = [], isLoading }: PostsProps) {
+function Posts({ posts = [] }: PostsProps) {
   const theme = useTheme();
   const isBelowSM = useMediaQuery(theme.breakpoints.down("sm"));
   const isBetweenSmMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isBetweenMdLg = useMediaQuery(theme.breakpoints.between("md", "lg"));
-  const isAboveLg = useMediaQuery(theme.breakpoints.up("lg"));
 
-  let parts = 1;
-  if (isBelowSM) {
-    parts = 1;
-  } else if (isBetweenSmMd) {
-    parts = 2;
-  } else if (isBetweenMdLg) {
-    parts = 3;
-  } else if (isAboveLg) {
-    parts = 4;
-  }
-
-  const splitPosts = splitArray(posts, posts?.length, parts);
-
-  if (isLoading) return <Loading />;
+  const parts = isBelowSM ? 1 : isBetweenSmMd ? 2 : isBetweenMdLg ? 3 : 4;
+  const splitPosts = splitArray(posts, parts);
 
   return (
     <Grid
@@ -52,9 +53,8 @@ function Posts({ posts = [], isLoading }: PostsProps) {
         mb: 3.75,
       }}
     >
-      {splitPosts?.map((postsPart, i) => (
+      {splitPosts?.map((posts, i) => (
         <Grid
-          gap={3}
           item
           key={i}
           sm={6}
@@ -62,8 +62,9 @@ function Posts({ posts = [], isLoading }: PostsProps) {
           lg={3}
           display="flex"
           flexDirection="column"
+          gap={3}
         >
-          {postsPart.map((post) => (
+          {posts.map((post) => (
             <Post key={post._id} post={post} />
           ))}
         </Grid>

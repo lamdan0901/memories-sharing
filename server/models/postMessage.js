@@ -7,7 +7,11 @@ const postSchema = mongoose.Schema(
     tags: [String],
     isPrivate: { type: Boolean, default: false },
     selectedFile: String,
-    comments: { type: [String], default: [] },
+    comments: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: "UserCommentPost",
+      default: [],
+    },
     creator: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "User",

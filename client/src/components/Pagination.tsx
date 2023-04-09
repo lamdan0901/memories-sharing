@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   Pagination as MUIPagination,
   PaginationItem,

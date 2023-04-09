@@ -9,7 +9,7 @@ import {
   useTheme,
   Stack,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Switch from "@mui/material/Switch";
 
@@ -18,20 +18,22 @@ import Form from "../../components/Form/Form";
 import { useAppSelector } from "../../store/store";
 import { useGetPostsQuery } from "../../apis/postSlice";
 import { useDebounce, useQuery } from "../../hooks";
+import Loading from "../../components/Loading/Loading";
 import Pagination from "../../components/Pagination";
 
 function Home() {
   const theme = useTheme();
-  const { user } = useAppSelector((state) => state.app);
-  const [modalOpen, setModelOpen] = useState(false);
-
   const query = useQuery();
   const navigate = useNavigate();
+  const [modalOpen, setModelOpen] = useState(false);
+
   const page = query.get("page") || "1";
   const searchQuery = query.get("search") || "";
   const tagsQuery = query.get("tags") || "";
+  const isMineQuery = query.get("isMine") === "true" || false;
 
-  const [isMine, setIsMine] = useState(false);
+  const { user } = useAppSelector((state) => state.app);
+  const [isMine, setIsMine] = useState(isMineQuery);
   const [searchValue, setSearchValue] = useState(() => ({
     text: searchQuery,
     tags: tagsQuery ?? "",
@@ -43,11 +45,13 @@ function Home() {
     text: searchQuery,
     tags: tagsQuery ?? "",
   }));
+
   const { data, isLoading } = useGetPostsQuery(queryValues);
 
   useDebounce(handleNavigationAndQuery, 600, [
     searchValue.text,
     searchValue.tags,
+    isMine,
   ]);
 
   useEffect(() => {
@@ -58,7 +62,7 @@ function Home() {
     navigate(
       `/posts?page=${toPage ?? page}&search=${searchValue.text}&tags=${
         searchValue.tags
-      }`
+      }&isMine=${!!isMine}`
     );
     setQueryValues({
       page: toPage ?? page,
@@ -76,9 +80,12 @@ function Home() {
     setSearchValue((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsMine(e.target.checked);
-  };
+  const memoizedPosts = useMemo(
+    () => <Posts posts={data?.posts} />,
+    [data?.posts]
+  );
+
+  if (isLoading) return <Loading />;
 
   return (
     <Grow in>
@@ -147,7 +154,7 @@ function Home() {
                 control={
                   <Switch
                     checked={isMine}
-                    onChange={handleSwitchChange}
+                    onChange={(e) => setIsMine(e.target.checked)}
                     inputProps={{ "aria-label": "controlled" }}
                   />
                 }
@@ -175,7 +182,7 @@ function Home() {
           onPageChange={handleNavigationAndQuery}
         />
 
-        <Posts posts={data?.posts} isLoading={isLoading} />
+        {memoizedPosts}
       </Container>
     </Grow>
   );

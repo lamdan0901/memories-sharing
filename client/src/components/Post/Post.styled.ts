@@ -8,6 +8,12 @@ export const Card = styled(MUICard)`
   border-radius: 15px;
   height: 100%;
   position: relative;
+  background-color: #eeeeff8c;
+  box-shadow: 0px 0px 15px 1px #7163e544;
+
+  &:hover {
+    box-shadow: 0px 0px 15px 1px #7163e577;
+  }
 `;
 
 export const Overlay = styled.div`

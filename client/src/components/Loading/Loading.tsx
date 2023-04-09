@@ -4,7 +4,7 @@ import React from "react";
 const Loading = () => {
   return (
     <Box
-      position="absolute"
+      position="fixed"
       zIndex={100}
       top="50%"
       left="50%"

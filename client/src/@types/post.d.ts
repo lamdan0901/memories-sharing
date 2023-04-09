@@ -1,6 +1,9 @@
 interface Post {
   _id?: string;
-  comments: string[];
+  comments: {
+    content: string;
+    creator: Pick<User, "firstName" | "lastName">;
+  }[];
   title: string;
   isPrivate: boolean;
   message: string;

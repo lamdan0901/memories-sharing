@@ -115,7 +115,7 @@ function Auth() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Paper className="auth" elevation={3}>
+      <Paper sx={{ borderRadius: 2 }} elevation={3}>
         <Box
           p={2}
           gap={2}

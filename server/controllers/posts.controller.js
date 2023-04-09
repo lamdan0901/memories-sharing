@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const PostMessage = require("../models/postMessage");
+const UserCommentPost = require("../models/userCommentPost");
 
 module.exports = {
   getPosts: async (req, res) => {
@@ -48,10 +49,17 @@ module.exports = {
     const { id } = req.params;
 
     try {
-      const post = await PostMessage.findById(id);
+      const post = await PostMessage.findById(id)
+        .populate({ path: "creator", select: "firstName lastName" })
+        .populate({
+          path: "comments",
+          populate: { path: "creator", select: "firstName lastName" },
+        });
+
       const recommendedPosts = await PostMessage.find({
         $and: [{ tags: { $in: post.tags } }, { _id: { $ne: post._id } }],
       })
+        .populate({ path: "creator", select: "firstName lastName" })
         .sort({ createdAt: 1 })
         .limit(4);
 
@@ -92,9 +100,17 @@ module.exports = {
       const post = await PostMessage.findById(_id);
       if (!post) return res.status(404).send("Post not found");
 
+      const newComment = await UserCommentPost.create({
+        content: comment,
+        creator: req.userId,
+      });
+
       const updatedPost = await PostMessage.findByIdAndUpdate(
         _id,
-        { ...post, comments: post.comments.push(comment) },
+        {
+          ...post,
+          comments: post.comments.push(newComment._id),
+        },
         {
           new: true,
         }
@@ -116,7 +132,10 @@ module.exports = {
     const post = await PostMessage.findById(_id);
     if (!post) return res.status(404).send("Post not found");
 
-    const index = post.likes.findIndex((userId) => userId === req.userId);
+    const index = post.likes.findIndex(
+      (userId) => userId.toString() === req.userId
+    );
+
     if (index === -1) {
       post.likes.push(req.userId); // like
     } else {
