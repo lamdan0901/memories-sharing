@@ -30,8 +30,8 @@ function PostDetail() {
   if (isLoading) return <CircularProgress />;
   if (!data)
     return (
-      <Typography variant="h1" color="red">
-        Error occurred!
+      <Typography variant="h3" color="red">
+        Post not found!
       </Typography>
     );
 
@@ -66,6 +66,7 @@ function PostDetail() {
             style={{
               maxWidth: isBelowMd ? "100%" : "65%",
               borderRadius: "10px",
+              objectFit: "cover",
             }}
           />
 
@@ -74,16 +75,31 @@ function PostDetail() {
             flexDirection="column"
             justifyContent="space-between"
             m={isBelowMd ? 2 : 0}
+            pr={isBelowMd ? 0 : 2}
             mt={2}
           >
             <Box>
-              <Typography variant={isBelowMd ? "h5" : "h4"} component="h2">
+              <Typography
+                variant={isBelowMd ? "h5" : "h4"}
+                component="h2"
+                gutterBottom
+              >
                 {post.title}
               </Typography>
-              <Typography variant="body1" component="p" gutterBottom>
+              <Typography
+                variant="body1"
+                textAlign="justify"
+                component="p"
+                gutterBottom
+              >
                 {post.message}
               </Typography>
-              <Typography fontSize={14} component="p" color="textSecondary">
+              <Typography
+                fontSize={14}
+                component="p"
+                gutterBottom
+                color="textSecondary"
+              >
                 by{" "}
                 <i>{`${post.creator?.firstName} ${post.creator?.lastName}`}</i>
               </Typography>

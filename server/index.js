@@ -6,6 +6,7 @@ require("dotenv").config({ path: __dirname + "/.env" });
 
 const postRoutes = require("./routes/posts");
 const authRoutes = require("./routes/users");
+const auth2Routes = require("./routes/users2");
 const habitRoutes = require("./routes/habits");
 
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ app.use(cors());
 
 app.use("/api/posts", postRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/auth2", auth2Routes);
 app.use("/api/habits", habitRoutes);
 
 // The Mongoose library is currently using the "strictQuery" option and that this option will be switched back to "false" in Mongoose 7 by default.

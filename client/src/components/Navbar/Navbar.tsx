@@ -116,7 +116,6 @@ function Navbar() {
                 variant="outlined"
                 color="primary"
                 size={isBelowSM ? "small" : "medium"}
-                className="navbar__btn-logout"
                 onClick={logOut}
                 sx={{ ml: isBelowSM ? 2 : 4 }}
               >

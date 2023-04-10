@@ -5,10 +5,10 @@ const userCommentPostSchema = mongoose.Schema(
     content: String,
     creator: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
+      ref: "User2",
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("UserCommentPost", userCommentPostSchema);
+module.exports = mongoose.model("User2CommentPost", userCommentPostSchema);

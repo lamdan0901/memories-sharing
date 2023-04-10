@@ -9,16 +9,16 @@ const postSchema = mongoose.Schema(
     selectedFile: String,
     comments: {
       type: [mongoose.SchemaTypes.ObjectId],
-      ref: "UserCommentPost",
+      ref: "User2CommentPost",
       default: [],
     },
     creator: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
+      ref: "User2",
     },
     likes: {
       type: [mongoose.SchemaTypes.ObjectId],
-      ref: "User",
+      ref: "User2",
       default: [],
     },
   },
