@@ -174,11 +174,11 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                 />
               )}
 
-              <Stack direction="row" width="100%" gap={1.5}>
+              <Stack my={2} direction="row" width="100%" gap={1.5}>
                 <Button
                   type="button"
                   variant="contained"
-                  color="secondary"
+                  sx={{ bgcolor: "#888", "&:hover": { bgcolor: "#888888c7" } }}
                   fullWidth
                   onClick={() => {
                     onModelOpen(false);
@@ -190,7 +190,10 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                 <Button
                   type="submit"
                   variant="contained"
-                  color="primary"
+                  sx={{
+                    bgcolor: "#7063e5",
+                    "&:hover": { bgcolor: "#7063e5c7" },
+                  }}
                   size="large"
                   disabled={
                     createPostStatus === "pending" ||
@@ -201,16 +204,6 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                   Submit
                 </Button>
               </Stack>
-              <Button
-                type="button"
-                variant="outlined"
-                color="warning"
-                fullWidth
-                onClick={() => setPost(initialPost)}
-                sx={{ marginY: 1.5 }}
-              >
-                Clear
-              </Button>
             </FormWrapper>
           </Paper>
         </Box>

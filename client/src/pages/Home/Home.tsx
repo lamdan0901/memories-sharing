@@ -160,13 +160,15 @@ function Home() {
                 }
               />
               <Button
-                variant="outlined"
+                variant="contained"
+                sx={{ bgcolor: "#7063e5", "&:hover": { bgcolor: "#7063e5c7" } }}
                 onClick={() => {
                   setModelOpen(true);
                 }}
               >
                 Add a new memory
               </Button>
+
               <Form modalOpen={modalOpen} onModelOpen={handleModelOpen} />
             </Stack>
           ) : (

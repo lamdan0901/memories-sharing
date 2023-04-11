@@ -18,6 +18,7 @@ function Pagination({ count = 5, page, onPageChange }: PaginationProps) {
       page={page}
       variant="outlined"
       color="primary"
+      shape="rounded"
       renderItem={(item) => (
         <PaginationItem
           {...item}

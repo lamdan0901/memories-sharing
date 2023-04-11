@@ -49,7 +49,7 @@ function Navbar() {
   function logOut() {
     localStorage.clear();
     setCurrentUser(null);
-    navigate("/auth", { replace: true });
+    navigate("/auth?type=login", { replace: true });
     dispatch(setSnackMsg("You've logged out!"));
   }
 
@@ -123,7 +123,7 @@ function Navbar() {
               </Button>
             </>
           ) : (
-            <Link to="/auth">
+            <Link to="/auth?type=login">
               <Button
                 variant="contained"
                 size={isBelowSM ? "small" : "medium"}

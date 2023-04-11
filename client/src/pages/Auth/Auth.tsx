@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useLogInMutation, useSignUpMutation } from "../../apis/authSlice";
 import { setSnackMsg, setUser } from "../../App/App.reducer";
@@ -28,11 +28,11 @@ const initialData = {
 function Auth() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const type = new URLSearchParams(location.search).get("type");
 
   const [formData, setFormData] = useState(initialData);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [needVerifying, setNeedVerifying] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
+  const [isSignUp, setIsSignUp] = useState(type === "sign-up");
 
   const [logIn, { status: logInStatus }] = useLogInMutation();
   const [signUp, { status: signUpStatus }] = useSignUpMutation();
@@ -51,9 +51,8 @@ function Auth() {
         localStorage.setItem("email", formData.email);
         setFormData(initialData);
         setIsSignUp(false);
-        dispatch(
-          setSnackMsg("Sign up successfully! Verified code sent to your email")
-        );
+        navigate("/auth?type=login");
+        dispatch(setSnackMsg("Sign up successfully!"));
         return;
       }
 
@@ -77,6 +76,7 @@ function Auth() {
 
   function switchAuthMode() {
     setIsSignUp((prev) => !prev);
+    navigate(`/auth?type=${isSignUp ? "login" : "sign-up"}`);
   }
 
   return (
