@@ -20,5 +20,4 @@ WIP
 
 ## Future features n tasks:
 
-- toast-snack bar, routes will be split into a new file
-- commentTime, rep to a cmt, lazy-loading-pagination for comment section, show the user's avatar, set up user profile , forgot password, reset password , email confirmation..
+- commentTime, rep to a cmt, update user's avatar, setup user profile, forgot password, reset password, email confirmation..
