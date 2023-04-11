@@ -4,34 +4,32 @@ import {
   Button,
   TextField,
   Typography,
-  Divider,
+  Avatar,
 } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 import parse from "html-react-parser";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
+import AVATAR from "../../assets/imgs/avatar.png";
 import { useCommentPostMutation } from "../../apis/postSlice";
 
 interface CommentSectionProps {
   post: Post;
 }
 
-// in the future, if I have time, I will implement more for this and other sections
-// such as 'like comment, commentTime, rep to a cmt, lazy-loading-pagination for comment section,
-//  show the user's avatar, set up user profile ...'
-
 function CommentSection({ post }: CommentSectionProps) {
   let currentUser: User | null = null;
   const savedUser = localStorage.getItem("currentUser");
   if (savedUser) currentUser = JSON.parse(savedUser);
 
-  const [commentPost] = useCommentPostMutation();
+  const [commentPost, { status }] = useCommentPostMutation();
   const [comment, setComment] = useState("");
 
-  function handleSendComment() {
+  async function handleSendComment() {
     if (!currentUser) return;
 
-    const finalComment = `${currentUser.firstName} ${currentUser.lastName}: ${comment}`;
-    commentPost({ finalComment, id: post._id ?? "" });
+    await commentPost({ comment, id: post._id ?? "" });
     setComment("");
   }
 
@@ -45,51 +43,71 @@ function CommentSection({ post }: CommentSectionProps) {
   return (
     <Box>
       <Box>
-        <Box>
-          <Typography variant="h5" gutterBottom>
-            Comments
-          </Typography>
-          {post.comments.map((comment, i) => {
-            comment = comment.replaceAll(/\n/gi, "<br />");
-            return <Typography key={i}>{parse(comment)}</Typography>;
-          })}
-        </Box>
+        <Typography variant="h5" gutterBottom>
+          Comments
+        </Typography>
 
-        <Divider sx={{ my: 2 }} />
+        {post.comments?.map(({ content, creator }, i) => {
+          return (
+            <Stack direction="row" mb={1.5} gap={1} key={i}>
+              <Avatar alt={creator.firstName} src={AVATAR} />
 
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Write a comment
-          </Typography>
-          <Stack direction="row">
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Your comment here"
-              placeholder="Enter to send"
-              multiline
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              onKeyDown={handleInputKeyDown}
-              sx={{ mr: 2 }}
-            />
-            <Button
-              disabled={!comment || !currentUser}
-              onClick={handleSendComment}
-            >
-              Send
-            </Button>
-          </Stack>
-
-          {!currentUser && (
-            <Stack direction="row">
-              <Typography variant="body2">
-                You need to login in order to comment on this post
-              </Typography>
-              <Link to="/auth">Login now</Link>
+              <Stack
+                sx={{
+                  bgcolor: "#eeeeffbd",
+                  border: "1px solid #eee",
+                  borderRadius: 2.5,
+                  p: 1,
+                }}
+                gap={1}
+                alignItems="start"
+              >
+                <Typography color="#7063e5" fontWeight="bold">
+                  {`${creator.firstName} ${creator.lastName}`}
+                </Typography>
+                <Typography>
+                  {parse(content.replaceAll(/\n/gi, "<br />"))}
+                </Typography>
+              </Stack>
             </Stack>
-          )}
-        </Box>
+          );
+        })}
+      </Box>
+
+      <Box mt={2}>
+        <Typography variant="h6" gutterBottom>
+          Write a comment
+        </Typography>
+        <Stack direction="row">
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Your comment here"
+            placeholder="Enter to send"
+            multiline
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyDown={handleInputKeyDown}
+            disabled={status === "pending"}
+            sx={{ mr: 2 }}
+          />
+          <Button
+            disabled={!comment || !currentUser || status === "pending"}
+            onClick={handleSendComment}
+            endIcon={<SendIcon />}
+          >
+            Send
+          </Button>
+        </Stack>
+
+        {!currentUser && (
+          <Stack direction="row">
+            <Typography variant="body2">
+              You need to login in order to comment on this post.{" "}
+              <Link to="/auth">Login now</Link>
+            </Typography>
+          </Stack>
+        )}
       </Box>
     </Box>
   );

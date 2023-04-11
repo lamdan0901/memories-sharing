@@ -1,8 +1,8 @@
 import {
-  Delete,
   MoreHoriz,
   ThumbUpAlt,
   ShareTwoTone,
+  ThumbUpAltOutlined,
 } from "@mui/icons-material";
 import {
   Button,
@@ -13,17 +13,17 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import moment from "moment";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import Form from "../../Form/Form";
 import {
   useLikePostMutation,
   useDeletePostMutation,
-} from "../../../apis/postSlice";
-import { Card, CardActions, Overlay, Overlay2 } from "./Post.styled";
-import { useAppSelector } from "../../../store/store";
-import { useNavigate } from "react-router-dom";
+} from "../../apis/postSlice";
+import { Card, CardActions, Overlay } from "./Post.styled";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { setSnackMsg } from "../../App/App.reducer";
+import Form from "../Form/Form";
 
 interface PostProps {
   post: Post;
@@ -31,13 +31,14 @@ interface PostProps {
 }
 
 function Post({ post, isRecommended }: PostProps) {
-  const { user } = useAppSelector((state) => state.app);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
-  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.app);
 
   const [modalOpen, setModelOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   function handleOpenMenu(event: React.MouseEvent<HTMLButtonElement>) {
     setAnchorEl(event.currentTarget);
@@ -53,15 +54,23 @@ function Post({ post, isRecommended }: PostProps) {
   }
 
   async function handleLikePost() {
-    await likePost(post._id as string)
-      .unwrap()
-      .catch((err) => console.log(err));
+    try {
+      await likePost(post._id as string).unwrap();
+    } catch (err) {
+      dispatch(setSnackMsg("Error occurred!"));
+      console.log(err);
+    }
   }
 
   async function handleDeletePost() {
-    await deletePost(post._id)
-      .unwrap()
-      .catch((err) => console.log(err));
+    try {
+      await deletePost(post._id).unwrap();
+      dispatch(setSnackMsg("Post deleted!"));
+    } catch (err) {
+      dispatch(setSnackMsg("Error occurred!"));
+      console.log(err);
+    }
+    handleCloseMenu();
   }
 
   function handleSharePost() {
@@ -72,11 +81,13 @@ function Post({ post, isRecommended }: PostProps) {
     navigator.clipboard.writeText(
       `${location.hostname}${port}/posts/${post._id}`
     );
+
+    dispatch(setSnackMsg("Link copied to clipboard!"));
   }
 
   function viewPostDetail() {
     window.scrollTo({
-      top: 0,
+      top: 150,
       left: 0,
       behavior: "smooth",
     });
@@ -91,22 +102,24 @@ function Post({ post, isRecommended }: PostProps) {
           onClick={viewPostDetail}
           image={post.selectedFile}
           alt="error while loading image"
-          sx={cardMediaStyle}
+          sx={{
+            cursor: "pointer",
+            transition: "all 0.2s ease-out",
+
+            "&.MuiCardMedia-img": {
+              transform: "scale(1)",
+              "@media (min-width: 600px)": {
+                maxHeight: "300px",
+              },
+              "&:hover": {
+                transform: "scale(1.1)",
+              },
+            },
+          }}
         />
 
-        {!isRecommended && (
+        {user?._id === post?.creator?._id && !isRecommended && (
           <Overlay>
-            <Typography variant="h6" sx={{ textShadow: "0px 0px 8px #111" }}>
-              {post.creator}
-            </Typography>
-            <Typography fontSize={12} sx={{ textShadow: "0px 0px 5px #111" }}>
-              {moment(post.createdAt).fromNow()}
-            </Typography>
-          </Overlay>
-        )}
-
-        {user?._id === post.creatorId && !isRecommended && (
-          <Overlay2>
             <IconButton
               sx={{ color: "white", background: "#22222238" }}
               size="small"
@@ -114,8 +127,9 @@ function Post({ post, isRecommended }: PostProps) {
             >
               <MoreHoriz fontSize="small" />
             </IconButton>
-          </Overlay2>
+          </Overlay>
         )}
+
         <Menu
           open={Boolean(anchorEl)}
           anchorEl={anchorEl}
@@ -125,37 +139,43 @@ function Post({ post, isRecommended }: PostProps) {
           <MenuItem onClick={handleDeletePost}>Delete</MenuItem>
         </Menu>
 
-        <Typography sx={{ m: 2.5, fontSize: 12 }} color="textSecondary">
+        <Typography sx={{ mx: 2.5, mt: 2, fontSize: 12 }} color="#7163e5eb">
           {(post.tags as string[]).map((tag) => {
             return tag ? `#${tag} ` : "";
           })}
         </Typography>
 
         <CardContent>
-          <Typography>{post.title}</Typography>
+          <Typography fontWeight="bold">{post.title}</Typography>
           <Typography fontSize={12} component="p" color="textSecondary">
-            {post.message}
+            by {`${post.creator?.firstName} ${post.creator?.lastName}`}
           </Typography>
         </CardContent>
 
         {!isRecommended && (
           <CardActions>
             <Button
-              color={
-                post.likes.includes(user?._id as string) ? "success" : "primary"
-              }
               size="small"
               onClick={handleLikePost}
+              startIcon={
+                post.likes.includes(user?._id as string) ? (
+                  <ThumbUpAlt fontSize="small" />
+                ) : (
+                  <ThumbUpAltOutlined fontSize="small" />
+                )
+              }
               sx={{
                 pointerEvents: !user ? "none" : "auto",
               }}
             >
-              <ThumbUpAlt fontSize="small" />
-              &nbsp; {post.likes.length} Like{post.likes.length > 1 ? "s" : ""}
+              {post.likes.length} Like{post.likes.length > 1 ? "s" : ""}
             </Button>
-            <Button size="small" onClick={handleSharePost}>
-              <ShareTwoTone fontSize="small" />
-              &nbsp; Share
+            <Button
+              size="small"
+              startIcon={<ShareTwoTone fontSize="small" />}
+              onClick={handleSharePost}
+            >
+              Share
             </Button>
           </CardActions>
         )}
@@ -173,18 +193,3 @@ function Post({ post, isRecommended }: PostProps) {
 }
 
 export default Post;
-
-const cardMediaStyle = {
-  cursor: "pointer",
-  transform: "scale(1)",
-  transition: "all 0.2s ease-out",
-  "&:hover": {
-    transform: "scale(1.2)",
-  },
-  "&.MuiCardMedia-img": {
-    maxHeight: "450px",
-    "@media (min-width: 600px)": {
-      maxHeight: "300px",
-    },
-  },
-};

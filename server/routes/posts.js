@@ -1,5 +1,6 @@
-import express from "express";
-import {
+const express = require("express");
+
+const {
   getPosts,
   getOnePost,
   commentPost,
@@ -7,17 +8,18 @@ import {
   likePost,
   updatePost,
   deletePost,
-} from "../controllers/posts.js";
-import auth from "../middleware/auth.js";
+} = require("../controllers/posts.controller");
+const auth = require("../middleware/auth");
+const optionalAuth = require("../middleware/optionalAuth");
 
-const router = express.Router();
+const postsRoutes = express.Router();
 
-router.get("/", getPosts);
-router.get("/:id", getOnePost);
-router.post("/", auth, createPost);
-router.patch("/:id-likePost", auth, likePost);
-router.patch("/:id-commentPost", auth, commentPost);
-router.patch("/:id", auth, updatePost);
-router.delete("/:id", auth, deletePost);
+postsRoutes.get("/", optionalAuth, getPosts);
+postsRoutes.get("/:id", optionalAuth, getOnePost);
+postsRoutes.post("/", auth, createPost);
+postsRoutes.patch("/:id-likePost", auth, likePost);
+postsRoutes.patch("/:id-commentPost", auth, commentPost);
+postsRoutes.patch("/:id", auth, updatePost);
+postsRoutes.delete("/:id", auth, deletePost);
 
-export default router;
+module.exports = postsRoutes;

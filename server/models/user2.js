@@ -1,11 +1,9 @@
 const mongoose = require("mongoose");
 
-const userSchema = mongoose.Schema(
+const user2Schema = mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    verificationCode: { type: String },
-    isVerified: { type: Boolean, required: true, default: false },
     email: {
       type: String,
       unique: true,
@@ -28,10 +26,4 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", userSchema);
-
-// we can have a validate function like this:
-// validate: {
-//  validator: value=>value.length>3,
-//  message: props=> `${props.value} is not a valid password`
-// }
+module.exports = mongoose.model("User2", user2Schema);

@@ -6,10 +6,10 @@ const BASE_PATH = "/posts";
 const postSlice = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getPosts: builder.query<GetPostsResponse, GetPostsPayload>({
-      query: ({ page, text, tags }) => ({
+      query: ({ page, text, tags, isMine }) => ({
         url: `${BASE_PATH}?page=${page}&search=${text || ""}&tags=${
           tags || ""
-        }`,
+        }&isMine=${isMine || false}`,
       }),
       providesTags: [queryTagTypes.POST],
     }),
@@ -32,11 +32,11 @@ const postSlice = baseApi.injectEndpoints({
       invalidatesTags: [queryTagTypes.POST],
     }),
 
-    commentPost: builder.mutation<void, { finalComment: string; id: string }>({
-      query: ({ finalComment, id }) => ({
+    commentPost: builder.mutation<void, { comment: string; id: string }>({
+      query: ({ comment, id }) => ({
         method: "PATCH",
         url: `${BASE_PATH}/${id}-commentPost`,
-        body: { comment: finalComment },
+        body: { comment },
       }),
       invalidatesTags: [queryTagTypes.POST],
     }),
