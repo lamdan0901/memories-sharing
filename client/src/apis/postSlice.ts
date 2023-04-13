@@ -11,7 +11,7 @@ const postSlice = baseApi.injectEndpoints({
           tags || ""
         }&isMine=${isMine || false}`,
       }),
-      providesTags: [queryTagTypes.POST],
+      providesTags: [queryTagTypes.ALL_POST],
     }),
 
     getOnePost: builder.query<{ post: Post; recommendedPosts: Post[] }, string>(
@@ -19,9 +19,16 @@ const postSlice = baseApi.injectEndpoints({
         query: (id) => ({
           url: `${BASE_PATH}/${id}`,
         }),
-        providesTags: [queryTagTypes.POST],
+        providesTags: [queryTagTypes.ONE_POST],
       }
     ),
+
+    getPostComments: builder.query<PostComment[], string>({
+      query: (id) => ({
+        url: `${BASE_PATH}/${id}/comments`,
+      }),
+      providesTags: [queryTagTypes.POST_COMMENT],
+    }),
 
     createPost: builder.mutation<void, Post>({
       query: (payload) => ({
@@ -29,16 +36,16 @@ const postSlice = baseApi.injectEndpoints({
         url: `${BASE_PATH}`,
         body: payload,
       }),
-      invalidatesTags: [queryTagTypes.POST],
+      invalidatesTags: [queryTagTypes.ALL_POST],
     }),
 
-    commentPost: builder.mutation<void, { comment: string; id: string }>({
+    commentPost: builder.mutation<void, { comment: string; id?: string }>({
       query: ({ comment, id }) => ({
         method: "PATCH",
         url: `${BASE_PATH}/${id}-commentPost`,
         body: { comment },
       }),
-      invalidatesTags: [queryTagTypes.POST],
+      invalidatesTags: [queryTagTypes.POST_COMMENT],
     }),
 
     likePost: builder.mutation<void, string>({
@@ -46,7 +53,7 @@ const postSlice = baseApi.injectEndpoints({
         method: "PATCH",
         url: `${BASE_PATH}/${id}-likePost`,
       }),
-      invalidatesTags: [queryTagTypes.POST],
+      invalidatesTags: [queryTagTypes.ALL_POST],
     }),
 
     updatePost: builder.mutation<
@@ -58,7 +65,7 @@ const postSlice = baseApi.injectEndpoints({
         url: `${BASE_PATH}/${id}`,
         body: payload,
       }),
-      invalidatesTags: [queryTagTypes.POST],
+      invalidatesTags: [queryTagTypes.ALL_POST],
     }),
 
     deletePost: builder.mutation<void, Post["_id"]>({
@@ -66,7 +73,7 @@ const postSlice = baseApi.injectEndpoints({
         method: "DELETE",
         url: `${BASE_PATH}/${id}`,
       }),
-      invalidatesTags: [queryTagTypes.POST],
+      invalidatesTags: [queryTagTypes.ALL_POST],
     }),
   }),
 });
@@ -76,6 +83,7 @@ export default postSlice;
 export const {
   useGetPostsQuery,
   useGetOnePostQuery,
+  useGetPostCommentsQuery,
   useCreatePostMutation,
   useCommentPostMutation,
   useLikePostMutation,
