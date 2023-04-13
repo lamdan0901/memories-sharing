@@ -34,7 +34,7 @@ function Post({ post, isRecommended }: PostProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [likePost] = useLikePostMutation();
-  const [deletePost] = useDeletePostMutation();
+  const [deletePost, { status }] = useDeletePostMutation();
   const { user } = useAppSelector((state) => state.app);
 
   const [modalOpen, setModelOpen] = useState(false);
@@ -136,7 +136,9 @@ function Post({ post, isRecommended }: PostProps) {
           onClose={handleCloseMenu}
         >
           <MenuItem onClick={() => handleModelOpen(true)}>Edit</MenuItem>
-          <MenuItem onClick={handleDeletePost}>Delete</MenuItem>
+          <MenuItem disabled={status === "pending"} onClick={handleDeletePost}>
+            Delete
+          </MenuItem>
         </Menu>
 
         <Typography sx={{ mx: 2.5, mt: 2, fontSize: 12 }} color="#7163e5eb">

@@ -4,7 +4,6 @@ import {
   Divider,
   Paper,
   Typography,
-  CircularProgress,
   Grid,
   Container,
   useTheme,
@@ -16,9 +15,13 @@ import moment from "moment";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { useGetOnePostQuery } from "../../apis/postSlice";
+import {
+  useGetOnePostQuery,
+  useGetPostCommentsQuery,
+} from "../../apis/postSlice";
 import Post from "../../components/Post/Post";
 import CommentSection from "./CommentSection";
+import Loading from "../../components/Loading/Loading";
 
 function PostDetail() {
   const navigate = useNavigate();
@@ -26,8 +29,9 @@ function PostDetail() {
   const theme = useTheme();
   const isBelowMd = useMediaQuery(theme.breakpoints.down("md"));
   const { data, isLoading } = useGetOnePostQuery(id ?? "");
+  const { data: postComments } = useGetPostCommentsQuery(id ?? "");
 
-  if (isLoading) return <CircularProgress />;
+  if (isLoading) return <Loading />;
   if (!data)
     return (
       <Typography variant="h3" color="red">
@@ -118,7 +122,7 @@ function PostDetail() {
 
         <Divider sx={{ my: 2.5 }} />
 
-        <CommentSection post={post} />
+        <CommentSection postId={post._id} postComments={postComments} />
 
         <Divider sx={{ my: 2.5 }} />
 

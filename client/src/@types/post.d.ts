@@ -1,9 +1,11 @@
+interface PostComment {
+  content: string;
+  creator: Pick<User, "firstName" | "lastName">;
+}
+
 interface Post {
   _id?: string;
-  comments: {
-    content: string;
-    creator: Pick<User, "firstName" | "lastName">;
-  }[];
+  comments: Comment[];
   title: string;
   isPrivate: boolean;
   message: string;

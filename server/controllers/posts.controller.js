@@ -49,12 +49,10 @@ module.exports = {
     const { id } = req.params;
 
     try {
-      const post = await PostMessage.findById(id)
-        .populate({ path: "creator", select: "firstName lastName" })
-        .populate({
-          path: "comments",
-          populate: { path: "creator", select: "firstName lastName" },
-        });
+      const post = await PostMessage.findById(id).populate({
+        path: "creator",
+        select: "firstName lastName",
+      });
 
       const recommendedPosts = await PostMessage.find({
         $and: [{ tags: { $in: post.tags } }, { _id: { $ne: post._id } }],
@@ -68,10 +66,25 @@ module.exports = {
       //   .equals("title")
       //   .where("creator")
       //   .equals("creator")
-      //   .select("title, creator")
-      //   .populate("likes");
 
       res.status(200).json({ post, recommendedPosts });
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
+  },
+
+  getPostComments: async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const { comments } = await PostMessage.findById(id)
+        .populate({
+          path: "comments",
+          populate: { path: "creator", select: "firstName lastName" },
+        })
+        .select("comments");
+
+      res.status(200).json(comments);
     } catch (err) {
       res.status(404).json({ message: err.message });
     }
@@ -86,7 +99,7 @@ module.exports = {
 
       // the 2 lines above is equal to this: const newPost = await PostMessage.create(post);
 
-      res.status(201).json(newPost);
+      res.status(201).json();
     } catch (err) {
       res.status(409).json({ message: err.message });
     }
@@ -105,7 +118,7 @@ module.exports = {
         creator: req.userId,
       });
 
-      const updatedPost = await PostMessage.findByIdAndUpdate(
+      await PostMessage.findByIdAndUpdate(
         _id,
         {
           ...post,
@@ -115,7 +128,7 @@ module.exports = {
           new: true,
         }
       );
-      res.status(200).json(updatedPost);
+      res.status(200).json();
     } catch (err) {
       res.status(409).json({ message: err.message });
     }
@@ -142,10 +155,11 @@ module.exports = {
       post.likes.splice(index, 1); // dislike
     }
 
-    const likedPost = await PostMessage.findByIdAndUpdate(_id, post, {
+    await PostMessage.findByIdAndUpdate(_id, post, {
       new: true,
     });
-    res.status(200).json(likedPost);
+
+    res.status(200).json();
   },
 
   updatePost: async (req, res) => {
@@ -155,10 +169,10 @@ module.exports = {
     if (!mongoose.Types.ObjectId.isValid(_id))
       return res.status(404).send("Post not found");
 
-    const updatedPost = await PostMessage.findByIdAndUpdate(_id, post, {
+    await PostMessage.findByIdAndUpdate(_id, post, {
       new: true, // return the object after update was applied.
     });
-    res.status(200).json(updatedPost);
+    res.status(200).json();
   },
 
   deletePost: async (req, res) => {

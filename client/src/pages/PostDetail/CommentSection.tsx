@@ -15,10 +15,11 @@ import AVATAR from "../../assets/imgs/avatar.png";
 import { useCommentPostMutation } from "../../apis/postSlice";
 
 interface CommentSectionProps {
-  post: Post;
+  postId?: string;
+  postComments?: PostComment[];
 }
 
-function CommentSection({ post }: CommentSectionProps) {
+function CommentSection({ postId, postComments }: CommentSectionProps) {
   let currentUser: User | null = null;
   const savedUser = localStorage.getItem("currentUser");
   if (savedUser) currentUser = JSON.parse(savedUser);
@@ -29,7 +30,7 @@ function CommentSection({ post }: CommentSectionProps) {
   async function handleSendComment() {
     if (!currentUser) return;
 
-    await commentPost({ comment, id: post._id ?? "" });
+    await commentPost({ comment, id: postId });
     setComment("");
   }
 
@@ -47,7 +48,7 @@ function CommentSection({ post }: CommentSectionProps) {
           Comments
         </Typography>
 
-        {post.comments?.map(({ content, creator }, i) => {
+        {postComments?.map(({ content, creator }, i) => {
           return (
             <Stack direction="row" mb={1.5} gap={1} key={i}>
               <Avatar alt={creator.firstName} src={AVATAR} />

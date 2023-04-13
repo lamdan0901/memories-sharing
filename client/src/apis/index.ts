@@ -8,7 +8,11 @@ import {
 
 export const EDT_BASE_API_REDUCER_KEY = "baseApi";
 
-export const queryTagTypes = { POST: "POST" };
+export const queryTagTypes = {
+  ALL_POST: "ALL_POST",
+  ONE_POST: "ONE_POST",
+  POST_COMMENT: "POST_COMMENT",
+};
 
 const customBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_APP_API_URL,
