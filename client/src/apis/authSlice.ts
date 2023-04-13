@@ -11,7 +11,7 @@ const authSlice = baseApi.injectEndpoints({
         url: `${BASE_PATH}/login-post`,
         body: payload,
       }),
-      invalidatesTags: [queryTagTypes.POST],
+      invalidatesTags: [queryTagTypes.ALL_POST],
     }),
 
     signUp: builder.mutation<void, any>({
