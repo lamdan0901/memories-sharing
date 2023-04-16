@@ -12,6 +12,7 @@ export const queryTagTypes = {
   ALL_POST: "ALL_POST",
   ONE_POST: "ONE_POST",
   POST_COMMENT: "POST_COMMENT",
+  POST_LIKE: "POST_LIKE",
 };
 
 const customBaseQuery = fetchBaseQuery({

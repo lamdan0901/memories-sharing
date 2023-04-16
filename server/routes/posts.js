@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   getPosts,
+  getPostsLikes,
   getOnePost,
   getPostComments,
   commentPost,
@@ -16,6 +17,7 @@ const optionalAuth = require("../middleware/optionalAuth");
 const postsRoutes = express.Router();
 
 postsRoutes.get("/", optionalAuth, getPosts);
+postsRoutes.get("/likes", optionalAuth, getPostsLikes);
 postsRoutes.get("/:id", optionalAuth, getOnePost);
 postsRoutes.get("/:id/comments", optionalAuth, getPostComments);
 postsRoutes.post("/", auth, createPost);

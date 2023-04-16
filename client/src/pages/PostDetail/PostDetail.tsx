@@ -1,3 +1,4 @@
+import { ThumbUpAlt, ThumbUpAltOutlined } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -16,20 +17,27 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
+  useLikePostMutation,
   useGetOnePostQuery,
   useGetPostCommentsQuery,
 } from "../../apis/postSlice";
 import Post from "../../components/Post/Post";
 import CommentSection from "./CommentSection";
+import { setSnackMsg } from "../../App/App.reducer";
 import Loading from "../../components/Loading/Loading";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
 function PostDetail() {
   const navigate = useNavigate();
-  const { id } = useParams();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const [likePost] = useLikePostMutation();
   const isBelowMd = useMediaQuery(theme.breakpoints.down("md"));
+
+  const { id } = useParams();
+  const { user } = useAppSelector((state) => state.app);
   const { data, isLoading } = useGetOnePostQuery(id ?? "");
-  const { data: postComments } = useGetPostCommentsQuery(id ?? "");
+  const { data: postCommentsNLikes } = useGetPostCommentsQuery(id ?? "");
 
   if (isLoading) return <Loading />;
   if (!data)
@@ -40,6 +48,16 @@ function PostDetail() {
     );
 
   const { post, recommendedPosts } = data;
+  const { comments, likes } = postCommentsNLikes ?? {};
+
+  async function handleLikePost() {
+    try {
+      await likePost(post._id as string).unwrap();
+    } catch (err) {
+      dispatch(setSnackMsg("Error occurred!"));
+      console.log(err);
+    }
+  }
 
   return (
     <Paper elevation={6} sx={{ p: 2.5, borderRadius: 3.75, mb: 3.75 }}>
@@ -48,12 +66,31 @@ function PostDetail() {
           <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>
             Back
           </Button>
+
           <Button
             startIcon={<PermMediaIcon />}
             onClick={() => navigate("/posts")}
-            sx={{ ml: 2 }}
+            sx={{ mx: 2 }}
           >
             Home
+          </Button>
+
+          <Button
+            size="small"
+            onClick={handleLikePost}
+            startIcon={
+              likes?.includes(user?._id as string) ? (
+                <ThumbUpAlt fontSize="small" />
+              ) : (
+                <ThumbUpAltOutlined fontSize="small" />
+              )
+            }
+            sx={{
+              pointerEvents: !user ? "none" : "auto",
+            }}
+          >
+            {likes?.length} Like
+            {likes && likes.length > 1 ? "s" : ""}
           </Button>
         </Box>
 
@@ -65,7 +102,7 @@ function PostDetail() {
           gap={isBelowMd ? 0 : 2}
         >
           <img
-            src={post.selectedFile || ""}
+            src={post.fullSizeImg || ""}
             alt="error while loading image"
             style={{
               maxWidth: isBelowMd ? "100%" : "65%",
@@ -122,7 +159,7 @@ function PostDetail() {
 
         <Divider sx={{ my: 2.5 }} />
 
-        <CommentSection postId={post._id} postComments={postComments} />
+        <CommentSection postId={post._id} postComments={comments} />
 
         <Divider sx={{ my: 2.5 }} />
 

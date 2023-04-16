@@ -14,6 +14,15 @@ const postSlice = baseApi.injectEndpoints({
       providesTags: [queryTagTypes.ALL_POST],
     }),
 
+    getPostsLikes: builder.query<LikeCount[], GetPostsPayload>({
+      query: ({ page, text, tags, isMine }) => ({
+        url: `${BASE_PATH}/likes?page=${page}&search=${text || ""}&tags=${
+          tags || ""
+        }&isMine=${isMine || false}`,
+      }),
+      providesTags: [queryTagTypes.POST_LIKE],
+    }),
+
     getOnePost: builder.query<{ post: Post; recommendedPosts: Post[] }, string>(
       {
         query: (id) => ({
@@ -23,7 +32,10 @@ const postSlice = baseApi.injectEndpoints({
       }
     ),
 
-    getPostComments: builder.query<PostComment[], string>({
+    getPostComments: builder.query<
+      { comments: PostComment[]; likes: string[] },
+      string
+    >({
       query: (id) => ({
         url: `${BASE_PATH}/${id}/comments`,
       }),
@@ -53,7 +65,7 @@ const postSlice = baseApi.injectEndpoints({
         method: "PATCH",
         url: `${BASE_PATH}/${id}-likePost`,
       }),
-      invalidatesTags: [queryTagTypes.ALL_POST],
+      invalidatesTags: [queryTagTypes.POST_LIKE, queryTagTypes.POST_COMMENT],
     }),
 
     updatePost: builder.mutation<
@@ -82,6 +94,7 @@ export default postSlice;
 
 export const {
   useGetPostsQuery,
+  useGetPostsLikesQuery,
   useGetOnePostQuery,
   useGetPostCommentsQuery,
   useCreatePostMutation,

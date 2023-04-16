@@ -32,13 +32,66 @@ module.exports = {
         .populate("creator")
         .sort({ createdAt: -1 })
         .limit(LIMIT)
-        .skip(startIndex);
+        .skip(startIndex)
+        .select({ likes: 0, fullSizeImg: 0 });
 
       res.status(200).json({
         posts,
         currentPage: +page,
         numOfPages: Math.ceil(total / LIMIT),
       });
+    } catch (err) {
+      console.log("err: ", err);
+      res.status(404).json({ message: err.message });
+    }
+  },
+
+  getPostsLikes: async (req, res) => {
+    const { page, search, tags, isMine } = req.query;
+
+    const LIMIT = 8;
+    const startIndex = (+page - 1) * LIMIT;
+    const filters = { $and: [{ isPrivate: false }] };
+
+    if (search) {
+      filters.$and.push({ title: { $regex: search?.trim(), $options: "i" } });
+    }
+
+    if (tags) {
+      filters.$and.push({ tags: { $in: tags?.trim()?.split(/[ .,]/) } });
+    }
+
+    if (isMine === "true" && req.userId) {
+      filters.$and.push({ "creator._id": mongoose.Types.ObjectId(req.userId) });
+
+      const i = filters.$and.findIndex((condition) => !condition.isPrivate);
+      filters.$and.splice(i, 1);
+    }
+
+    try {
+      const postsLikes = await PostMessage.aggregate([
+        {
+          $lookup: {
+            from: "user2",
+            localField: "creator",
+            foreignField: "_id",
+            as: "creator",
+          },
+        },
+        { $match: filters },
+        { $sort: { createdAt: -1 } },
+        { $skip: startIndex },
+        { $limit: LIMIT },
+        {
+          $project: {
+            likeCount: { $size: "$likes" },
+            likes: 1,
+            // creator: { $arrayElemAt: ["$creator", 0] },
+          },
+        },
+      ]);
+
+      res.status(200).json(postsLikes);
     } catch (err) {
       console.log("err: ", err);
       res.status(404).json({ message: err.message });
@@ -59,7 +112,8 @@ module.exports = {
       })
         .populate({ path: "creator", select: "firstName lastName" })
         .sort({ createdAt: 1 })
-        .limit(4);
+        .limit(4)
+        .select({ thumbnail: 0 });
 
       // another way to query with conditions
       // await PostMessage.where("title")
@@ -77,14 +131,14 @@ module.exports = {
     const { id } = req.params;
 
     try {
-      const { comments } = await PostMessage.findById(id)
+      const { comments, likes } = await PostMessage.findById(id)
         .populate({
           path: "comments",
           populate: { path: "creator", select: "firstName lastName" },
         })
-        .select("comments");
+        .select("comments likes");
 
-      res.status(200).json(comments);
+      res.status(200).json({ comments, likes });
     } catch (err) {
       res.status(404).json({ message: err.message });
     }

@@ -51,6 +51,7 @@ function Navbar() {
     setCurrentUser(null);
     navigate("/auth?type=login", { replace: true });
     dispatch(setSnackMsg("You've logged out!"));
+    dispatch(setUser(null));
   }
 
   return (

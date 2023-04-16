@@ -40,12 +40,10 @@ function Auth() {
   async function handleSubmitForm(e: React.FormEvent<any>) {
     e.preventDefault();
 
+    if (!inputsValid()) return;
+
     try {
       if (isSignUp) {
-        if (formData.password !== formData.confirmPassword) {
-          console.error("Confirm password not correct");
-          return;
-        }
         await signUp(formData).unwrap();
 
         localStorage.setItem("email", formData.email);
@@ -77,6 +75,32 @@ function Auth() {
   function switchAuthMode() {
     setIsSignUp((prev) => !prev);
     navigate(`/auth?type=${isSignUp ? "login" : "sign-up"}`);
+  }
+
+  function inputsValid() {
+    if (isSignUp) {
+      if (formData.password !== formData.confirmPassword) {
+        dispatch(setSnackMsg("Confirm password not correct"));
+        return false;
+      }
+
+      if (
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.email ||
+        !formData.username
+      ) {
+        dispatch(setSnackMsg("Input fields not left blank"));
+        return false;
+      }
+    }
+
+    if (!formData.username || !formData.password) {
+      dispatch(setSnackMsg("Input fields not left blank"));
+      return false;
+    }
+
+    return true;
   }
 
   return (

@@ -100,7 +100,7 @@ function Post({ post, isRecommended }: PostProps) {
         <CardMedia
           component="img"
           onClick={viewPostDetail}
-          image={post.selectedFile}
+          image={post.thumbnail}
           alt="error while loading image"
           sx={{
             cursor: "pointer",
@@ -160,7 +160,7 @@ function Post({ post, isRecommended }: PostProps) {
               size="small"
               onClick={handleLikePost}
               startIcon={
-                post.likes.includes(user?._id as string) ? (
+                post.likes?.includes(user?._id as string) ? (
                   <ThumbUpAlt fontSize="small" />
                 ) : (
                   <ThumbUpAltOutlined fontSize="small" />
@@ -170,7 +170,8 @@ function Post({ post, isRecommended }: PostProps) {
                 pointerEvents: !user ? "none" : "auto",
               }}
             >
-              {post.likes.length} Like{post.likes.length > 1 ? "s" : ""}
+              {post.likeCount} Like
+              {post.likeCount && post.likeCount > 1 ? "s" : ""}
             </Button>
             <Button
               size="small"
