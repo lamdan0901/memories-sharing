@@ -16,7 +16,7 @@ import Switch from "@mui/material/Switch";
 import Posts from "./Posts/Posts";
 import Form from "../../components/Form/Form";
 import { useAppSelector } from "../../store/store";
-import { useGetPostsQuery } from "../../apis/postSlice";
+import { useGetPostsQuery, useGetPostsLikesQuery } from "../../apis/postSlice";
 import { useDebounce, useQuery } from "../../hooks";
 import Loading from "../../components/Loading/Loading";
 import Pagination from "../../components/Pagination";
@@ -26,6 +26,7 @@ function Home() {
   const query = useQuery();
   const navigate = useNavigate();
   const [modalOpen, setModelOpen] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   const page = query.get("page") || "1";
   const searchQuery = query.get("search") || "";
@@ -47,16 +48,27 @@ function Home() {
   }));
 
   const { data, isLoading } = useGetPostsQuery(queryValues);
+  const { data: likes } = useGetPostsLikesQuery(queryValues);
+
+  useEffect(() => {
+    setQueryValues({ page, text: searchQuery, tags: tagsQuery, isMine });
+  }, [page, searchQuery, tagsQuery, isMine]);
+
+  useEffect(() => {
+    setPosts(
+      () =>
+        data?.posts.map((post) => {
+          const like = likes?.find((like) => like._id === post._id);
+          return like ? Object.assign({}, like, post) : post;
+        }) ?? []
+    );
+  }, [data?.posts, likes]);
 
   useDebounce(handleNavigationAndQuery, 600, [
     searchValue.text,
     searchValue.tags,
     isMine,
   ]);
-
-  useEffect(() => {
-    setQueryValues({ page, text: searchQuery, tags: tagsQuery, isMine });
-  }, [page, searchQuery, tagsQuery, isMine]);
 
   function handleNavigationAndQuery(toPage?: string) {
     navigate(
@@ -79,11 +91,6 @@ function Home() {
   function handleSearchTextChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
-
-  const memoizedPosts = useMemo(
-    () => <Posts posts={data?.posts} />,
-    [data?.posts]
-  );
 
   if (isLoading) return <Loading />;
 
@@ -173,7 +180,7 @@ function Home() {
             </Stack>
           ) : (
             <Typography color="#555">
-              Please login to create or like a memory
+              Please login to share your memories
             </Typography>
           )}
         </Box>
@@ -184,7 +191,7 @@ function Home() {
           onPageChange={handleNavigationAndQuery}
         />
 
-        {memoizedPosts}
+        <Posts posts={posts} />
       </Container>
     </Grow>
   );

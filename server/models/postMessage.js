@@ -6,7 +6,8 @@ const postSchema = mongoose.Schema(
     message: String,
     tags: [String],
     isPrivate: { type: Boolean, default: false },
-    selectedFile: String,
+    thumbnail: String,
+    fullSizeImg: String,
     comments: {
       type: [mongoose.SchemaTypes.ObjectId],
       ref: "User2CommentPost",
