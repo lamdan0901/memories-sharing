@@ -21,7 +21,7 @@ module.exports = {
         return res.status(400).json({ message: "Invalid credential" });
 
       if (!currentUser.isVerified)
-        return res.status(400).json({ message: "Email not verified" });
+        return res.status(401).json({ message: "Email not verified" });
 
       const accessToken = jwt.sign(
         { email: currentUser.email, id: currentUser._id },
@@ -47,7 +47,7 @@ module.exports = {
 
     const userExisted = await User.findOne({ username, email });
     if (userExisted)
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(409).json({ message: "User already exists" });
 
     try {
       const code = generateVerificationCode();
@@ -73,26 +73,28 @@ module.exports = {
   verifyEmail: async (req, res) => {
     const { email, verificationCode } = req.body;
 
-    const user = await User.findOne({ email, verificationCode });
-    if (user) {
-      const expirationTime = 10 * 60 * 1000;
-      const currentTime = new Date();
-      const createdAtTime = new Date(user.updatedAt);
+    try {
+      const user = await User.findOne({ email, verificationCode });
+      if (!!user) {
+        const expirationTime = 10 * 60 * 1000;
+        const currentTime = new Date();
+        const createdAtTime = new Date(user.updatedAt);
 
-      if (currentTime - createdAtTime <= expirationTime) {
-        user.isVerified = true;
-        await user.save();
-        ``;
+        if (currentTime - createdAtTime <= expirationTime) {
+          user.isVerified = true;
+          await user.save();
+          return res.status(200).send({ message: "Account verified" });
+        }
 
-        return res.status(200).send({ message: "Account verified" });
+        return res.status(400).send({ message: "Verification code expired" });
       }
 
-      return res.status(400).send({ message: "Verification code expired" });
+      res
+        .status(402)
+        .send({ message: "Invalid verification code or email not exist" });
+    } catch (err) {
+      res.status(402).send({ message: "Unexpected error." });
     }
-
-    res
-      .status(400)
-      .send({ message: "Invalid verification code or email not exist" });
   },
 
   resendCode: async (req, res) => {

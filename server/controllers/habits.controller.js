@@ -6,7 +6,7 @@ module.exports = {
   getAllHabits: async (req, res) => {
     const { page = 1, search, viewTodayHabits } = req.query;
     const LIMIT = 8;
-    const filters = { $and: [{ user: req.userId }] };
+    const filters = { $and: [{ creator: req.userId }] };
 
     if (search) {
       filters.$and.push({ title: { $regex: search?.trim(), $options: "i" } });
@@ -43,7 +43,7 @@ module.exports = {
     const habit = req.body;
 
     try {
-      const data = await Habit.create({ ...habit, user: req.userId });
+      const data = await Habit.create({ ...habit, creator: req.userId });
       res.status(201).json({ data });
     } catch (err) {
       res.status(409).json({ message: err.message });

@@ -11,7 +11,7 @@ const habitSchema = mongoose.Schema(
       ref: "Performance",
       default: [],
     },
-    user: {
+    creator: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "User",
       required: true,
