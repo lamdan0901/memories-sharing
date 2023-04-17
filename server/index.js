@@ -13,7 +13,9 @@ const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   "http://127.0.0.1:5173",
+  "http://127.0.0.1:3006",
   "https://memories-sharing.vercel.app",
+  "https://habit-tracker-indol.vercel.app",
 ];
 const corsOptions = {
   origin: function (origin, callback) {
