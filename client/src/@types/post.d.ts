@@ -3,6 +3,12 @@ interface PostComment {
   creator: Pick<User, "firstName" | "lastName">;
 }
 
+interface LikeCount {
+  _id: string;
+  likeCount: string;
+  likes: string[];
+}
+
 interface Post {
   _id?: string;
   comments: Comment[];
@@ -11,8 +17,10 @@ interface Post {
   message: string;
   creator?: User;
   tags: string[] | string;
-  selectedFile: string;
-  likes: string[];
+  thumbnail: string;
+  fullSizeImg: string;
+  likeCount?: number;
+  likes?: string[];
   createdAt?: Date;
 }
 

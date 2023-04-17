@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import parse from "html-react-parser";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import AVATAR from "../../assets/imgs/avatar.png";
@@ -24,13 +24,20 @@ function CommentSection({ postId, postComments }: CommentSectionProps) {
   const savedUser = localStorage.getItem("currentUser");
   if (savedUser) currentUser = JSON.parse(savedUser);
 
+  const commentBoxRef = useRef<HTMLDivElement>(null);
   const [commentPost, { status }] = useCommentPostMutation();
   const [comment, setComment] = useState("");
 
   async function handleSendComment() {
     if (!currentUser) return;
 
-    await commentPost({ comment, id: postId });
+    await commentPost({
+      comment: comment
+        .trim()
+        .replace(/\n+/g, "\n")
+        .replaceAll(/\n/gi, "<br />"),
+      id: postId,
+    });
     setComment("");
   }
 
@@ -41,6 +48,12 @@ function CommentSection({ postId, postComments }: CommentSectionProps) {
     }
   }
 
+  useEffect(() => {
+    if (commentBoxRef.current) {
+      commentBoxRef.current.scrollTop = commentBoxRef.current.scrollHeight;
+    }
+  }, [postComments]);
+
   return (
     <Box>
       <Box>
@@ -48,31 +61,38 @@ function CommentSection({ postId, postComments }: CommentSectionProps) {
           Comments
         </Typography>
 
-        {postComments?.map(({ content, creator }, i) => {
-          return (
-            <Stack direction="row" mb={1.5} gap={1} key={i}>
-              <Avatar alt={creator.firstName} src={AVATAR} />
+        <Box
+          ref={commentBoxRef}
+          maxHeight={500}
+          overflow="auto"
+          bgcolor="#eeeeff8c"
+          borderRadius={2.5}
+          p={postComments?.length ? 1 : 0}
+        >
+          {postComments?.map(({ content, creator }, i) => {
+            return (
+              <Stack direction="row" mb={1.5} gap={1} key={i}>
+                <Avatar alt={creator.firstName} src={AVATAR} />
 
-              <Stack
-                sx={{
-                  bgcolor: "#eeeeffbd",
-                  border: "1px solid #eee",
-                  borderRadius: 2.5,
-                  p: 1,
-                }}
-                gap={1}
-                alignItems="start"
-              >
-                <Typography color="#7063e5" fontWeight="bold">
-                  {`${creator.firstName} ${creator.lastName}`}
-                </Typography>
-                <Typography>
-                  {parse(content.replaceAll(/\n/gi, "<br />"))}
-                </Typography>
+                <Stack
+                  gap={1}
+                  alignItems="start"
+                  sx={{
+                    bgcolor: "#fff",
+                    border: "1px solid #eee",
+                    borderRadius: 2.5,
+                    p: 1,
+                  }}
+                >
+                  <Typography color="#7063e5" fontWeight="bold">
+                    {`${creator.firstName} ${creator.lastName}`}
+                  </Typography>
+                  <Typography>{parse(content)}</Typography>
+                </Stack>
               </Stack>
-            </Stack>
-          );
-        })}
+            );
+          })}
+        </Box>
       </Box>
 
       <Box mt={2}>
@@ -102,12 +122,10 @@ function CommentSection({ postId, postComments }: CommentSectionProps) {
         </Stack>
 
         {!currentUser && (
-          <Stack direction="row">
-            <Typography variant="body2">
-              You need to login in order to comment on this post.{" "}
-              <Link to="/auth">Login now</Link>
-            </Typography>
-          </Stack>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            You need to login in order to comment on this post.{" "}
+            <Link to="/auth?type=login">Login now</Link>
+          </Typography>
         )}
       </Box>
     </Box>

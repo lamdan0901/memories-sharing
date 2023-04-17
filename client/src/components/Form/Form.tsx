@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   Stack,
 } from "@mui/material";
+import imageCompression from "browser-image-compression";
 
 import {
   useCreatePostMutation,
@@ -28,7 +29,8 @@ const initialPost = {
   message: "",
   isPrivate: false,
   tags: [],
-  selectedFile: "",
+  fullSizeImg: "",
+  thumbnail: "",
   likes: [],
   comments: [],
 };
@@ -64,6 +66,11 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
       return;
     }
 
+    if (post.thumbnail === "") {
+      dispatch(setSnackMsg("Please select a photo!"));
+      return;
+    }
+
     try {
       if (!_post) {
         await createPost(post).unwrap();
@@ -78,6 +85,49 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
       console.log(err);
       dispatch(setSnackMsg("Changes not submitted, error occurred!"));
     }
+  }
+
+  async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const imageFile = event.target.files?.[0];
+    if (!imageFile) return;
+
+    try {
+      const [thumbnailFile, fullSizeImgFile] = await Promise.all([
+        imageCompression(imageFile, {
+          maxSizeMB: 0.08,
+        }),
+        imageCompression(imageFile, {
+          maxSizeMB: 1,
+          initialQuality: imageFile.size / 1024 / 1024 > 1 ? 0.6 : 0.8,
+        }),
+      ]);
+
+      const [thumbnail, fullSizeImg] = await Promise.all([
+        convertToBase64(thumbnailFile),
+        convertToBase64(fullSizeImgFile),
+      ]);
+      if (!thumbnail || !fullSizeImg) throw new Error();
+
+      setPost({ ...post, thumbnail, fullSizeImg });
+    } catch (error) {
+      dispatch(
+        setSnackMsg(
+          "Error while uploading photo, please check the photo format"
+        )
+      );
+    }
+  }
+
+  function convertToBase64(file: File) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        resolve(typeof base64String === "string" ? base64String : "");
+      };
+      reader.onerror = reject;
+    });
   }
 
   function handleFormInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -150,20 +200,18 @@ function FormModal({ _post, modalOpen, onModelOpen }: FormModalProps) {
                 sx={{ width: "100%", mx: 0 }}
               />
 
-              <FileInput>
-                <FileBase
+              <Box width="97%" mt={1.25} mb={2.5}>
+                <FileInput
                   type="file"
-                  multiple={false}
-                  onDone={({ base64 }: any) =>
-                    setPost({ ...post, selectedFile: base64 })
-                  }
+                  accept="image/*"
+                  onChange={handleImageUpload}
                 />
-              </FileInput>
+              </Box>
 
-              {post.selectedFile && (
+              {post.thumbnail && (
                 <CardMedia
                   component="img"
-                  image={post.selectedFile}
+                  image={post.thumbnail}
                   alt="error while loading image"
                   sx={{
                     "&.MuiCardMedia-img": {
