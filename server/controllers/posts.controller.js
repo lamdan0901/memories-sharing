@@ -113,13 +113,7 @@ module.exports = {
         .populate({ path: "creator", select: "firstName lastName" })
         .sort({ createdAt: 1 })
         .limit(4)
-        .select({ thumbnail: 0 });
-
-      // another way to query with conditions
-      // await PostMessage.where("title")
-      //   .equals("title")
-      //   .where("creator")
-      //   .equals("creator")
+        .select({ likes: 0, fullSizeImg: 0 });
 
       res.status(200).json({ post, recommendedPosts });
     } catch (err) {

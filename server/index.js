@@ -11,10 +11,24 @@ const habitRoutes = require("./routes/habits");
 
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  "http://127.0.0.1:5173",
+  "https://memories-sharing.vercel.app",
+];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+
 const app = express();
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use("/api/posts", postRoutes);
 app.use("/api/auth", authRoutes);
